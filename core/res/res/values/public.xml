@@ -2028,6 +2028,7 @@
   <public type="style" name="Widget.DeviceDefault.CheckedTextView" id="0x010301db" />
   <public type="style" name="Widget.DeviceDefault.Light.CheckedTextView" id="0x010301dc" />
 
+<<<<<<< HEAD
 <!-- ===============================================================
      Resources added in version 18 of the platform (Jelly Bean MR2)
      =============================================================== -->
@@ -2052,5 +2053,8 @@
   <public type="style" name="Theme.Holo.Light.NoActionBar.Overscan" id="0x010301de" />
   <public type="style" name="Theme.DeviceDefault.NoActionBar.Overscan" id="0x010301df" />
   <public type="style" name="Theme.DeviceDefault.Light.NoActionBar.Overscan" id="0x010301e0" />
+=======
+  <java-symbol type="array" name="config_vendorServices" />
+>>>>>>> a53702d... vendor services (to arrays.xml)
 
 </resources>
