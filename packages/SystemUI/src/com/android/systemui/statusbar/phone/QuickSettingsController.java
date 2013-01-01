@@ -43,6 +43,7 @@ import static com.android.internal.util.cm.QSConstants.TILE_VOLUME;
 import static com.android.internal.util.cm.QSConstants.TILE_WIFI;
 import static com.android.internal.util.cm.QSConstants.TILE_WIFIAP;
 import static com.android.internal.util.cm.QSConstants.TILE_WIMAX;
+import static com.android.internal.util.cm.QSConstants.TILE_FCHARGE;
 import static com.android.internal.util.cm.QSUtils.deviceSupportsBluetooth;
 import static com.android.internal.util.cm.QSUtils.deviceSupportsDockBattery;
 import static com.android.internal.util.cm.QSUtils.deviceSupportsImeSwitcher;
@@ -97,10 +98,12 @@ import com.android.systemui.quicksettings.VolumeTile;
 import com.android.systemui.quicksettings.WiFiDisplayTile;
 import com.android.systemui.quicksettings.WiFiTile;
 import com.android.systemui.quicksettings.WifiAPTile;
+import com.android.systemui.quicksettings.FChargeTile;
 
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.HashSet;
+
 
 public class QuickSettingsController {
     private static String TAG = "QuickSettingsController";
@@ -243,6 +246,8 @@ public class QuickSettingsController {
                 if (expandedDesktopEnabled(resolver)) {
                     qs = new ExpandedDesktopTile(mContext, this, mHandler);
                 }
+            } else if (tile.equals(TILE_FCHARGE)) {
+                qs = new FChargeTile(mContext, inflater, mContainerView, this, mHandler);
             }
 
             if (qs != null) {
