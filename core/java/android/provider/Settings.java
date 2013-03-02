@@ -3134,6 +3134,11 @@ public final class Settings {
             "navigation_ring_targets_2",
         };
 
+         /**
+         * Force dual panel for settings
+         */
+        public static final String FORCE_DUAL_PANEL = "force_dualpanel";
+
         /**
          * Holds the text for the Carrier label. An empty string
          * will bring the default text back.
