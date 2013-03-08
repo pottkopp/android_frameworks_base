@@ -3456,6 +3456,12 @@ public final class Settings {
 *        public static final String VOLUME_KEYS_CONTROL_RING_STREAM = "volume_keys_control_ring_stream";
          */
 
+        /**  
+         * Give MMS Notifications a breathing effect
+         * @hide
+         */
+        public static final String MMS_BREATH = "mms_breath";
+
         /**
          * Battery warning preferences
          *
