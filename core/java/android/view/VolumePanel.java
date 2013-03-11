@@ -935,32 +935,6 @@ public class VolumePanel extends Handler implements OnSeekBarChangeListener, Vie
         }
     }
 
-    protected void onDisplaySafeVolumeWarning() {
-        synchronized (sConfirmSafeVolumeLock) {
-            if (sConfirmSafeVolumeDialog != null) {
-                return;
-            }
-            sConfirmSafeVolumeDialog = new AlertDialog.Builder(mContext)
-                    .setMessage(com.android.internal.R.string.safe_media_volume_warning)
-                    .setPositiveButton(com.android.internal.R.string.yes,
-                                        new DialogInterface.OnClickListener() {
-                        public void onClick(DialogInterface dialog, int which) {
-                            mAudioService.disableSafeMediaVolume();
-                        }
-                    })
-                    .setNegativeButton(com.android.internal.R.string.no, null)
-                    .setIconAttribute(android.R.attr.alertDialogIcon)
-                    .create();
-            final WarningDialogReceiver warning = new WarningDialogReceiver(mContext,
-                    sConfirmSafeVolumeDialog);
-
-            sConfirmSafeVolumeDialog.setOnDismissListener(warning);
-            sConfirmSafeVolumeDialog.getWindow().setType(
-                                                    WindowManager.LayoutParams.TYPE_KEYGUARD_DIALOG);
-            sConfirmSafeVolumeDialog.show();
-        }
-    }
-
     /**
      * Lock on this VolumePanel instance as long as you use the returned ToneGenerator.
      */
@@ -1077,7 +1051,7 @@ public class VolumePanel extends Handler implements OnSeekBarChangeListener, Vie
                 break;
 
             case MSG_DISPLAY_SAFE_VOLUME_WARNING:
-                onDisplaySafeVolumeWarning();
+                //onDisplaySafeVolumeWarning();
                 break;
         }
     }
