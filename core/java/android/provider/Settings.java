@@ -3609,6 +3609,11 @@ public final class Settings {
         public static final String LOCKSCREEN_DISABLE_HINTS = "lockscreen_disable_hints";
 
         /**
+         * Use alternative application resolver
+         */
+        public static final String ACTIVITY_RESOLVER_USE_ALT = "activity_resolver_use_alt";
+
+        /**
          * Settings to backup. This is here so that it's in the same place as the settings
          * keys and easy to update.
          *
