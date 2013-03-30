@@ -671,7 +671,7 @@ public class PhoneWindowManager implements WindowManagerPolicy {
             resolver.registerContentObserver(Settings.System.getUriFor(
                     Settings.System.HARDWARE_KEY_REBINDING), false, this);
             resolver.registerContentObserver(Settings.System.getUriFor(
-                    Settings.System.NAVIGATION_BAR_HEIGHT), false, this);
+                    Settings.System.NAV_BUTTONS_HEIGHT), false, this);
 
             updateSettings();
         }
@@ -1332,6 +1332,20 @@ public class PhoneWindowManager implements WindowManagerPolicy {
                     Settings.System.VOLUME_WAKE_SCREEN, 0, UserHandle.USER_CURRENT) == 1);
             mVolBtnMusicControls = (Settings.System.getIntForUser(resolver,
                     Settings.System.VOLBTN_MUSIC_CONTROLS, 1, UserHandle.USER_CURRENT) == 1);
+
+            int  mNavButtonsHeight = Settings.System.getInt(resolver,
+                    Settings.System.NAV_BUTTONS_HEIGHT, 48);
+            mNavigationBarHeightForRotation[mPortraitRotation] =
+            mNavigationBarHeightForRotation[mUpsideDownRotation] =
+                    mNavButtonsHeight * DisplayMetrics.DENSITY_DEVICE / DisplayMetrics.DENSITY_DEFAULT;
+            mNavigationBarHeightForRotation[mLandscapeRotation] =
+            mNavigationBarHeightForRotation[mSeascapeRotation] =
+                    mNavButtonsHeight * DisplayMetrics.DENSITY_DEVICE / DisplayMetrics.DENSITY_DEFAULT;
+            mNavigationBarWidthForRotation[mPortraitRotation] =
+            mNavigationBarWidthForRotation[mUpsideDownRotation] =
+            mNavigationBarWidthForRotation[mLandscapeRotation] =
+            mNavigationBarWidthForRotation[mSeascapeRotation] =
+                    (mNavButtonsHeight - 6) * DisplayMetrics.DENSITY_DEVICE / DisplayMetrics.DENSITY_DEFAULT;
 
             boolean keyRebindingEnabled = Settings.System.getInt(resolver,
                     Settings.System.HARDWARE_KEY_REBINDING, 0) == 1;
