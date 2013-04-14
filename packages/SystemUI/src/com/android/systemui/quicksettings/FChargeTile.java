@@ -52,10 +52,9 @@ public class FChargeTile extends QuickSettingsTile {
         return mInstance;
     }
 
-    public FChargeTile(Context context, LayoutInflater inflater,
-            QuickSettingsContainerView container,
-            QuickSettingsController qsc, Handler handler) {
-        super(context, inflater, container, qsc);
+
+    public FChargeTile(Context context, QuickSettingsController qsc, Handler handler) {
+        super(context, qsc);
 
         updateTileState();
 
