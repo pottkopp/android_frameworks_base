@@ -48,7 +48,7 @@ public class FChargeTile extends QuickSettingsTile {
 
     public static QuickSettingsTile getInstance(Context context, LayoutInflater inflater,
             QuickSettingsContainerView container, final QuickSettingsController qsc, Handler handler) {
-        if (mInstance == null) mInstance = new FChargeTile(context, inflater, container, qsc, handler);
+        if (mInstance == null) mInstance = new FChargeTile(context, qsc, handler);
         return mInstance;
     }
 
