@@ -2427,12 +2427,12 @@ public class Activity extends ContextThemeWrapper
                         getWindow().addFlags(WindowManager.LayoutParams.FLAG_FORCE_NOT_FULLSCREEN);
                         getWindow().clearFlags(WindowManager.LayoutParams.FLAG_FULLSCREEN);
                         mHandler.postDelayed(new Runnable() {
-                                                 public void run() {
-                                                                           getWindow().clearFlags(WindowManager.LayoutParams.FLAG_FORCE_NOT_FULLSCREEN);
-                                                                           getWindow().addFlags(WindowManager.LayoutParams.FLAG_FULLSCREEN);     
-                                                 }
-                                                 
-                                                 }, 10000);
+                            public void run() {
+                                getWindow().clearFlags(WindowManager.LayoutParams.FLAG_FORCE_NOT_FULLSCREEN);
+                                getWindow().addFlags(WindowManager.LayoutParams.FLAG_FULLSCREEN);     
+                            }
+
+                        }, 10000);
                     }
                     
                     mightBeMyGesture = false;
