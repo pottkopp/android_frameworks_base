@@ -2224,9 +2224,7 @@ public class InputMethodService extends AbstractInputMethodService {
             return;
         }
         
-        //setExtractViewShown(true);
-        //always disable fullscreen keyboard
-        setExtractViewShown(false);
+        setExtractViewShown(true);
     }
     
     /**
