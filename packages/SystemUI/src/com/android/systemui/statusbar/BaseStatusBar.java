@@ -50,17 +50,12 @@ import android.content.res.Configuration;
 import android.content.res.Resources;
 import android.database.ContentObserver;
 import android.graphics.Bitmap;
-import android.graphics.Canvas;
-import android.graphics.Color;
-import android.graphics.ColorFilter;
 import android.graphics.drawable.BitmapDrawable;
 import android.graphics.drawable.Drawable;
-import android.graphics.drawable.TransitionDrawable;
-import android.graphics.Paint;
-import android.graphics.PixelFormat;
-import android.graphics.PorterDuff;
+import android.graphics.Canvas;
 import android.graphics.PorterDuff.Mode;
 import android.graphics.PorterDuffXfermode;
+import android.graphics.Paint;
 import android.graphics.Rect;
 import android.net.Uri;
 import android.os.Build;
@@ -236,7 +231,7 @@ public abstract class BaseStatusBar extends SystemUI implements
             notificationsBehaviour = Settings.System.getInt(
                     mContext.getContentResolver(), Settings.System.NOTIFICATIONS_BEHAVIOUR, 0);
         }
-    }; 
+    };
 
     private RemoteViews.OnClickHandler mOnClickHandler = new RemoteViews.OnClickHandler() {
         @Override
@@ -249,7 +244,7 @@ public abstract class BaseStatusBar extends SystemUI implements
                 try {
                     // The intent we are sending is for the application, which
                     // won't have permission to immediately start an activity after
-                    // the user switches to home.  We know it is safe to do at this
+                    // the user switches to home. We know it is safe to do at this
                     // point, so make sure new activity switches are now allowed.
                     ActivityManagerNative.getDefault().resumeAppSwitches();
                     // Also, notifications can be launched from the lock screen,
@@ -276,14 +271,14 @@ public abstract class BaseStatusBar extends SystemUI implements
         mDisplay = mWindowManager.getDefaultDisplay();
 
         mProvisioningObserver.onChange(false); // set up
-        SettingsObserver.onChange(false); 
+        SettingsObserver.onChange(false);
         mContext.getContentResolver().registerContentObserver(
                 Settings.Global.getUriFor(Settings.Global.DEVICE_PROVISIONED), true,
                 mProvisioningObserver);
 
         mContext.getContentResolver().registerContentObserver(
                 Settings.System.getUriFor(Settings.System.NOTIFICATIONS_BEHAVIOUR), true,
-                SettingsObserver); 
+                SettingsObserver);
 
         mBarService = IStatusBarService.Stub.asInterface(
                 ServiceManager.getService(Context.STATUS_BAR_SERVICE));
@@ -410,7 +405,7 @@ public abstract class BaseStatusBar extends SystemUI implements
         if (mHaloActive) {
             if (mHalo == null) {
                 LayoutInflater inflater = (LayoutInflater) mContext
-                        .getSystemService(Context.LAYOUT_INFLATER_SERVICE); 
+                        .getSystemService(Context.LAYOUT_INFLATER_SERVICE);
                 mHalo = (Halo)inflater.inflate(R.layout.halo_trigger, null);
                 mHalo.setLayerType (View.LAYER_TYPE_HARDWARE, null);
                 WindowManager.LayoutParams params = mHalo.getWMParams();
@@ -848,7 +843,7 @@ public abstract class BaseStatusBar extends SystemUI implements
     protected void workAroundBadLayerDrawableOpacity(View v) {
     }
 
-    protected  boolean inflateViews(NotificationData.Entry entry, ViewGroup parent) {
+    protected boolean inflateViews(NotificationData.Entry entry, ViewGroup parent) {
         int minHeight =
                 mContext.getResources().getDimensionPixelSize(R.dimen.notification_min_height);
         int maxHeight =
@@ -938,7 +933,7 @@ public abstract class BaseStatusBar extends SystemUI implements
 
         if (notificationsBehaviour != 3) {
             entry.setLargeView(expandedLarge);
-        } 
+        }
 
         return true;
     }
@@ -969,7 +964,7 @@ public abstract class BaseStatusBar extends SystemUI implements
             try {
                 // The intent we are sending is for the application, which
                 // won't have permission to immediately start an activity after
-                // the user switches to home.  We know it is safe to do at this
+                // the user switches to home. We know it is safe to do at this
                 // point, so make sure new activity switches are now allowed.
                 ActivityManagerNative.getDefault().resumeAppSwitches();
                 // Also, notifications can be launched from the lock screen,
@@ -980,7 +975,7 @@ public abstract class BaseStatusBar extends SystemUI implements
 
             if (mIntent != null) {
 
-                if (mFloat && !"android".equals(mPkg) && !"com.paranoid.halo".equals(mPkg)) {
+                if (mFloat && !"android".equals(mPkg) && !"com.cyanogenmod.halo".equals(mPkg)) {
                     Intent transparent = new Intent(mContext, com.android.systemui.Transparent.class);
                     transparent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_FLOATING_WINDOW);
                     mContext.startActivity(transparent);
@@ -995,7 +990,7 @@ public abstract class BaseStatusBar extends SystemUI implements
                 try {
                     mIntent.send(mContext, 0, overlay);
                 } catch (PendingIntent.CanceledException e) {
-                    // the stack trace isn't very helpful here.  Just log the exception message.
+                    // the stack trace isn't very helpful here. Just log the exception message.
                     Slog.w(TAG, "Sending contentIntent failed: " + e);
                 }
             }
@@ -1018,7 +1013,7 @@ public abstract class BaseStatusBar extends SystemUI implements
      * The LEDs are turned o)ff when the notification panel is shown, even just a little bit.
      * This was added last-minute and is inconsistent with the way the rest of the notifications
      * are handled, because the notification isn't really cancelled.  The lights are just
-     * turned off.  If any other notifications happen, the lights will turn back on.  Steve says
+     * turned off. If any other notifications happen, the lights will turn back on.  Steve says
      * this is what he wants. (see bug 1131461)
      */
     protected void visibilityChanged(boolean visible) {
@@ -1066,12 +1061,12 @@ public abstract class BaseStatusBar extends SystemUI implements
         // Construct the round icon
         BitmapDrawable bd = (BitmapDrawable) mContext.getResources().getDrawable(R.drawable.halo_bg);
         int iconSize = bd.getBitmap().getWidth();
-        int smallIconSize = mContext.getResources().getDimensionPixelSize(R.dimen.status_bar_icon_size);        
+        int smallIconSize = mContext.getResources().getDimensionPixelSize(R.dimen.status_bar_icon_size);
         Bitmap roundIcon = Bitmap.createBitmap(iconSize, iconSize, Bitmap.Config.ARGB_8888);
         Canvas canvas = new Canvas(roundIcon);
         canvas.drawARGB(0, 0, 0, 0);
 
-        if (notification.notification.largeIcon != null) {           
+        if (notification.notification.largeIcon != null) {
             Paint smoothingPaint = new Paint();
             smoothingPaint.setAntiAlias(true);
             smoothingPaint.setFilterBitmap(true);
@@ -1085,7 +1080,7 @@ public abstract class BaseStatusBar extends SystemUI implements
             try {
                 Drawable icon = StatusBarIconView.getIcon(mContext,
                     new StatusBarIcon(notification.pkg, notification.user, notification.notification.icon,
-                    notification.notification.iconLevel, 0, notification.notification.tickerText)); 
+                    notification.notification.iconLevel, 0, notification.notification.tickerText));
                 if (icon == null) icon = mContext.getPackageManager().getApplicationIcon(notification.pkg);
                 int margin = (iconSize - smallIconSize) / 2;
                 icon.setBounds(margin, margin, iconSize - margin, iconSize - margin);
@@ -1121,7 +1116,7 @@ public abstract class BaseStatusBar extends SystemUI implements
 
         NotificationData.Entry entry = new NotificationData.Entry(key, notification, iconView,
                 createRoundIcon(notification));
-        entry.hide = entry.notification.pkg.equals("com.paranoid.halo");
+        entry.hide = entry.notification.pkg.equals("com.cyanogenmod.halo");
 
         final PendingIntent contentIntent = notification.notification.contentIntent;
         if (contentIntent != null) {
@@ -1149,10 +1144,10 @@ public abstract class BaseStatusBar extends SystemUI implements
     }
 
     protected boolean expandView(NotificationData.Entry entry, boolean expand) {
-        int rowHeight = mContext.getResources().getDimensionPixelSize(R.dimen.notification_row_min_height); 
+        int rowHeight = mContext.getResources().getDimensionPixelSize(R.dimen.notification_row_min_height);
         ViewGroup.LayoutParams lp = entry.row.getLayoutParams();
         if (entry.expandable() && notificationsBehaviour != 3 && notificationsBehaviour != 1
-                && (expand || notificationsBehaviour == 2)) { 
+                && (expand || notificationsBehaviour == 2)) {
             if (DEBUG) Slog.d(TAG, "setting expanded row height to WRAP_CONTENT");
             lp.height = ViewGroup.LayoutParams.WRAP_CONTENT;
         } else {
@@ -1249,7 +1244,7 @@ public abstract class BaseStatusBar extends SystemUI implements
         boolean orderUnchanged = notification.notification.when==oldNotification.notification.when
                 && notification.score == oldNotification.score;
                 // score now encompasses/supersedes isOngoing()
-        
+ 
         boolean updateTicker = (notification.notification.tickerText != null
                 && !TextUtils.equals(notification.notification.tickerText,
                         oldEntry.notification.notification.tickerText)) || mHaloActive;
@@ -1292,7 +1287,7 @@ public abstract class BaseStatusBar extends SystemUI implements
                 updateExpansionStates();
             }
             catch (RuntimeException e) {
-                // It failed to add cleanly.  Log, and remove the view from the panel.
+                // It failed to add cleanly. Log, and remove the view from the panel.
                 Slog.w(TAG, "Couldn't reapply views for package " + contentView.getPackage(), e);
                 removeNotificationViews(key);
                 addNotificationViews(key, notification);

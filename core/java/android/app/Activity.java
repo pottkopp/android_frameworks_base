@@ -5099,7 +5099,7 @@ public class Activity extends ContextThemeWrapper
     }
 
     final void attach(Context context, ActivityThread aThread, Instrumentation instr, IBinder token,
-            Application application, Intent intent, ActivityInfo info, CharSequence title, 
+            Application application, Intent intent, ActivityInfo info, CharSequence title,
             Activity parent, String id, NonConfigurationInstances lastNonConfigurationInstances,
             Configuration config) {
         attach(context, aThread, instr, token, 0, application, intent, info, title, parent, id,
@@ -5142,7 +5142,7 @@ public class Activity extends ContextThemeWrapper
 
             mWindow.setFlags(WindowManager.LayoutParams.FLAG_DIM_BEHIND,
                     WindowManager.LayoutParams.FLAG_DIM_BEHIND);
-            WindowManager.LayoutParams params = mWindow.getAttributes(); 
+            WindowManager.LayoutParams params = mWindow.getAttributes();
             params.alpha = 1f;
             params.dimAmount = 0.25f;
             mWindow.setAttributes((android.view.WindowManager.LayoutParams) params);
@@ -5261,7 +5261,7 @@ public class Activity extends ContextThemeWrapper
                             if (getApplicationInfo().targetSdkVersion
                                     >= android.os.Build.VERSION_CODES.ICE_CREAM_SANDWICH) {
                                 throw new IllegalStateException(
-                                        "trying to requery an already closed cursor  "
+                                        "trying to requery an already closed cursor "
                                         + mc.mCursor);
                             }
                         }
@@ -5403,7 +5403,7 @@ public class Activity extends ContextThemeWrapper
         return mResumed;
     }
 
-    void dispatchActivityResult(String who, int requestCode, 
+    void dispatchActivityResult(String who, int requestCode,
         int resultCode, Intent data) {
         if (false) Log.v(
             TAG, "Dispatching result: who=" + who + ", reqCode=" + requestCode

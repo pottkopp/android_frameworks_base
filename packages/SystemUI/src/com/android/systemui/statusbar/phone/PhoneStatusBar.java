@@ -2401,7 +2401,7 @@ public class PhoneStatusBar extends BaseStatusBar {
 
         // Show the ticker if one is requested. Also don't do this
         // until status bar window is attached to the window manager,
-        // because...  well, what's the point otherwise?  And trying to
+        // because... well, what's the point otherwise? And trying to
         // run a ticker without being attached will crash!
         if (n.notification.tickerText != null && mStatusBarContainer.getWindowToken() != null) {
             if (0 == (mDisabled & (StatusBarManager.DISABLE_NOTIFICATION_ICONS
@@ -2796,7 +2796,6 @@ public class PhoneStatusBar extends BaseStatusBar {
                 if (DEBUG) {
                     Slog.v(TAG, "configuration changed: " + mContext.getResources().getConfiguration());
                 }
-                //HERE//
                 Configuration config = mContext.getResources().getConfiguration();
                 mDisplay.getSize(mCurrentDisplaySize);
                 updateResources();
