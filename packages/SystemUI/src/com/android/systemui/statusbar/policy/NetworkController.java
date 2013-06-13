@@ -409,6 +409,8 @@ public class NetworkController extends BroadcastReceiver {
         } else if (action.equals(Intent.ACTION_AIRPLANE_MODE_CHANGED)) {
             updateAirplaneMode();
             refreshViews();
+        } else if (action.equals("com.android.settings.LABEL_CHANGED")) {
+            refreshViews();
         } else if (action.equals(WimaxManagerConstants.NET_4G_STATE_CHANGED_ACTION) ||
                 action.equals(WimaxManagerConstants.SIGNAL_LEVEL_CHANGED_ACTION) ||
                 action.equals(WimaxManagerConstants.WIMAX_NETWORK_STATE_CHANGED_ACTION)) {
@@ -1180,6 +1182,10 @@ public class NetworkController extends BroadcastReceiver {
         if (customLabel != null && customLabel.trim().length() > 0) {
             combinedLabel = customLabel;
             mobileLabel = customLabel;
+            if (Settings.System.getInt(mContext.getContentResolver(),
+                    Settings.System.NOTIFICATION_SHOW_WIFI_SSID, 0) == 0) {
+                wifiLabel = customLabel;
+            }
         }
 
         if (DEBUG) {
