@@ -1992,7 +1992,7 @@ public final class Settings {
          */
         public static final String WAKEUP_WHEN_PLUGGED_UNPLUGGED = "wakeup_when_plugged_unplugged";
 
-        /** 
+        /**
          * The mapping of stream type (integer) to its setting.
          */
         public static final String[] VOLUME_SETTINGS = {
@@ -3102,6 +3102,12 @@ public final class Settings {
          * @hide
          */
         public static final String QUIET_HOURS_DIM = "quiet_hours_dim";
+                
+        /**
+         * Do you want popups/floating windows?
+         * @hide
+         */
+        public static final String WE_WANT_POPUPS = "we_want_popups";
 
         /**
          * Sets the lockscreen background style
