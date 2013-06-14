@@ -5142,12 +5142,17 @@ public class Activity extends ContextThemeWrapper
             mWindow.setCloseOnTouchOutsideIfNotSet(true);
             mWindow.setGravity(Gravity.CENTER);
 
-            mWindow.setFlags(WindowManager.LayoutParams.FLAG_DIM_BEHIND,
-                    WindowManager.LayoutParams.FLAG_DIM_BEHIND);
-            WindowManager.LayoutParams params = mWindow.getAttributes();
-            params.alpha = 1f;
-            params.dimAmount = 0.25f;
-            mWindow.setAttributes((android.view.WindowManager.LayoutParams) params);
+            if (styleArray.getBoolean(com.android.internal.R.styleable.Window_windowNoTitle, false)) {
+                mWindow.requestFeature(Window.FEATURE_NO_TITLE);
+            }
+            if (this instanceof LayerActivity || android.os.Process.myUid() == android.os.Process.SYSTEM_UID) {
+                mWindow.setFlags(WindowManager.LayoutParams.FLAG_DIM_BEHIND,
+                        WindowManager.LayoutParams.FLAG_DIM_BEHIND);
+                WindowManager.LayoutParams params = mWindow.getAttributes();
+                params.alpha = 1f;
+                params.dimAmount = 0.25f;
+                mWindow.setAttributes((android.view.WindowManager.LayoutParams) params);
+            }
 
             // Scale it
             scaleFloatingWindow(context);
