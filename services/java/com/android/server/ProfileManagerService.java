@@ -185,10 +185,6 @@ public class ProfileManagerService extends IProfileManager.Stub {
         }
     }
 
-    private String getActiveSSID() {
-        return mWifiManager.getConnectionInfo().getSSID().replace("\"", "");
-    }
-
     @Override
     public void resetAll() {
         enforceChangePermissions();
