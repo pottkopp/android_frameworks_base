@@ -89,7 +89,7 @@ public class ProfileManagerService extends IProfileManager.Stub {
     private boolean mDirty;
 
     private WifiManager mWifiManager;
-    private String lastConnectedSsid = "";
+    private String mlastConnectedSSID;
 
     private BroadcastReceiver mIntentReceiver = new BroadcastReceiver() {
         @Override
@@ -108,7 +108,7 @@ public class ProfileManagerService extends IProfileManager.Stub {
                 switch (state) {
                     case COMPLETED:
                         triggerState = Profile.TriggerState.ON_CONNECT;
-                        lastConnectedSsid = getActiveSSID();
+                        mlastConnectedSSID = getActiveSSID();
                         break;
                     case DISCONNECTED:
                         triggerState = Profile.TriggerState.ON_DISCONNECT;
@@ -117,15 +117,14 @@ public class ProfileManagerService extends IProfileManager.Stub {
                         return;
                 }
                 for (Profile p : mProfiles.values()) {
-                    if (triggerState ==  p.getWifiTrigger(lastConnectedSsid)) {
+                    if (triggerState ==  p.getWifiTrigger(mlastConnectedSSID)) {
                         try {
                             setActiveProfile(p, true);
                         } catch (RemoteException e) {
-                            Log.e(TAG, "Something went wrong while setting profile", e);
+                            Log.e(TAG, "Could not update profile on wifi AP change", e);
                         }
                     }
                 }
-
             }
         }
     };
@@ -137,7 +136,7 @@ public class ProfileManagerService extends IProfileManager.Stub {
     public ProfileManagerService(Context context) {
         mContext = context;
         mWifiManager = (WifiManager)mContext.getSystemService(Context.WIFI_SERVICE);
-        lastConnectedSsid = getActiveSSID();
+        mlastConnectedSSID = getActiveSSID();
 
         mWildcardGroup = new NotificationGroup(
                 context.getString(com.android.internal.R.string.wildcardProfile),
@@ -184,6 +183,10 @@ public class ProfileManagerService extends IProfileManager.Stub {
                 Log.e(TAG, "Error loading xml from resource: ", ex);
             }
         }
+    }
+
+    private String getActiveSSID() {
+        return mWifiManager.getConnectionInfo().getSSID().replace("\"", "");
     }
 
     @Override

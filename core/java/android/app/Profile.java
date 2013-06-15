@@ -121,23 +121,25 @@ public final class Profile implements Parcelable, Comparable {
     }
 
     public int getWifiTrigger(String ssid) {
-        if (mWifiTriggers.containsKey(ssid)){
+        if (ssid != null && mWifiTriggers.containsKey(ssid)) {
             return mWifiTriggers.get(ssid);
         }
         return TriggerState.DISABLED;
     }
 
     public void setWifiTrigger(String ssid, int value) {
+        if (ssid == null || value < TriggerState.ON_CONNECT || value > TriggerState.DISABLED) {
+            return;
+        }
         if (value == TriggerState.DISABLED && mWifiTriggers.containsKey(ssid)) {
             mWifiTriggers.remove(ssid);
         } else {
-            mWifiTriggers.put(ssid, new Integer(value));
+            mWifiTriggers.put(ssid, value);
         }
         mDirty = true;
     }
 
-    public int compareTo(Object obj)
-    {
+    public int compareTo(Object obj) {
         Profile tmp = (Profile) obj;
         if (mName.compareTo(tmp.mName) < 0) {
             return -1;
@@ -428,16 +430,16 @@ public final class Profile implements Parcelable, Comparable {
         for (ConnectionSettings cs : connections.values()) {
             cs.getXmlString(builder, context);
         }
-        if (!mWifiTriggers.isEmpty()){
-            builder.append("<wifiTriggers>\n");
+        if (!mWifiTriggers.isEmpty()) {
+            builder.append("<triggers>\n");
             for (Map.Entry<String,Integer> e : mWifiTriggers.entrySet()) {
-                builder.append("<trigger name=\"");
+                builder.append("<wifiAP ssid=\"");
                 builder.append(e.getKey());
-                builder.append("\" value=\"");
+                builder.append("\" state=\"");
                 builder.append(e.getValue());
-                builder.append("\"></trigger>\n");
+                builder.append("\"></wifiAP>\n");
             }
-            builder.append("</wifiTriggers>\n");
+            builder.append("</triggers>\n");
         }
 
         builder.append("</profile>\n");
@@ -471,12 +473,12 @@ public final class Profile implements Parcelable, Comparable {
             throws XmlPullParserException,
             IOException {
         int event = xpp.next();
-        HashMap<String, Integer> triggers = new HashMap<String,Integer>();
-        while (event != XmlPullParser.END_TAG || xpp.getName().equals("trigger")) {
+        HashMap<String, Integer> triggers = new HashMap<String, Integer>();
+        while (event != XmlPullParser.END_TAG || xpp.getName().equals("wifiAP")) {
             if (event == XmlPullParser.START_TAG){
-                String ssid = xpp.getAttributeValue(null, "name");
-                String value = xpp.getAttributeValue(null, "value");
-                triggers.put(ssid, new Integer(value));
+                String ssid = xpp.getAttributeValue(null, "ssid");
+                String state = xpp.getAttributeValue(null, "state");
+                triggers.put(ssid, Integer.valueOf(state));
             }
             event = xpp.next();
         }
@@ -557,7 +559,7 @@ public final class Profile implements Parcelable, Comparable {
                     ConnectionSettings cs = ConnectionSettings.fromXml(xpp, context);
                     profile.connections.put(cs.getConnectionId(), cs);
                 }
-                if (name.equals("wifiTriggers")) {
+                if (name.equals("triggers")) {
                     profile.mWifiTriggers = readWifiTriggersFromXml(xpp, context);
                 }
             }
