@@ -34,6 +34,7 @@ import java.util.Collection;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Map.Entry;
 import java.util.UUID;
 
 /**
@@ -97,21 +98,24 @@ public final class Profile implements Parcelable, Comparable {
         public static final int DISABLED = 2;
     }
 
-    private static class ProfileTrigger implements Parcelable {
+    public static class ProfileTrigger implements Parcelable {
         private int mType;
         private String mId;
+        private String mName;
         private int mState;
 
-        public ProfileTrigger(int type, String id, int state) {
+        public ProfileTrigger(int type, String id, int state, String name) {
             mType = type;
             mId = id;
             mState = state;
+            mName = name;
         }
 
         private ProfileTrigger(Parcel in) {
             mType = in.readInt();
             mId = in.readString();
             mState = in.readInt();
+            mName = in.readString();
         }
 
         @Override
@@ -119,11 +123,28 @@ public final class Profile implements Parcelable, Comparable {
             dest.writeInt(mType);
             dest.writeString(mId);
             dest.writeInt(mState);
+            dest.writeString(mName);
         }
 
         @Override
         public int describeContents() {
             return 0;
+        }
+
+        public int getType() {
+            return mType;
+        }
+
+        public String getName() {
+            return mName;
+        }
+
+        public String getId() {
+            return mId;
+        }
+
+        public int getState() {
+            return mState;
         }
 
         public void getXmlString(StringBuilder builder, Context context) {
@@ -137,6 +158,8 @@ public final class Profile implements Parcelable, Comparable {
             builder.append(mId);
             builder.append("\" state=\"");
             builder.append(mState);
+            builder.append("\" name=\"");
+            builder.append(mName);
             builder.append("\"></");
             builder.append(itemType);
             builder.append(">\n");
@@ -156,8 +179,12 @@ public final class Profile implements Parcelable, Comparable {
 
             String id = xpp.getAttributeValue(null, getIdType(type));
             int state = Integer.valueOf(xpp.getAttributeValue(null, "state"));
+            String triggerName =  xpp.getAttributeValue(null, "name");
+            if (triggerName == null) {
+                triggerName = id;
+            }
 
-            return new ProfileTrigger(type, id, state);
+            return new ProfileTrigger(type, id, state, triggerName);
         }
 
         private static String getIdType(int type) {
@@ -213,7 +240,18 @@ public final class Profile implements Parcelable, Comparable {
         return TriggerState.DISABLED;
     }
 
-    public void setTrigger(int type, String id, int state) {
+    public ArrayList<ProfileTrigger> getTriggersFromType(int type) {
+        ArrayList<ProfileTrigger> result = new ArrayList<ProfileTrigger>();
+        for (Entry<String, ProfileTrigger> profileTrigger:  mTriggers.entrySet()) {
+            ProfileTrigger trigger = profileTrigger.getValue();
+            if (trigger.getType() == type) {
+                result.add(trigger);
+            }
+        }
+        return result;
+    }
+
+    public void setTrigger(int type, String id, int state, String name) {
         if (id == null
                 || type < TriggerType.WIFI || type > TriggerType.BLUETOOTH
                 || state < TriggerState.ON_CONNECT || state > TriggerState.DISABLED) {
@@ -229,7 +267,7 @@ public final class Profile implements Parcelable, Comparable {
         } else if (trigger != null) {
             trigger.mState = state;
         } else {
-            mTriggers.put(id, new ProfileTrigger(type, id, state));
+            mTriggers.put(id, new ProfileTrigger(type, id, state, name));
         }
 
         mDirty = true;
