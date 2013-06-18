@@ -3484,6 +3484,13 @@ public final class Settings {
         public static final String CUSTOM_CARRIER_LABEL = "custom_carrier_label";
 
         /**
+         * Choose side for Clear button on Recents window
+         * 0 = left, 1 = right
+         * @hide
+         */
+        public static final String CLEAR_RECENTS_POSITION = "clear_recents_position"; 
+
+        /**
          * Whether or not to use the app sidebar
          * @hide
          */
