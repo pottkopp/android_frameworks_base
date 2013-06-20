@@ -53,7 +53,7 @@ public class CircleBattery extends ImageView implements BatteryController.Batter
     private boolean mPercentage;    // whether or not to show percentage number
     private int     mBatteryStatus; // current battery status
     private int     mLevel;         // current battery level
-    private int mWarningLevel;      // battery level under which circle should become red
+    private int     mWarningLevel;  // battery level under which circle should become red 
     private int     mAnimOffset;    // current level of charging animation
     private boolean mIsAnimating;   // stores charge-animation status to reliably remove callbacks
 
@@ -253,11 +253,12 @@ public class CircleBattery extends ImageView implements BatteryController.Batter
         canvas.drawArc(drawRect, 270 + animOffset, 3.6f * level, false, usePaint);
         // if chosen by options, draw percentage text in the middle
         // always skip percentage when 100, so layout doesnt break
-        if (unknownStatus) {
-            mPaintFont.setColor(usePaint.getColor());
-            canvas.drawText("?", textX, mTextY, mPaintFont);
-        } else if (level < 100 && mPercentage) {
-            mPaintFont.setColor(usePaint.getColor());
+        if (level < 100 && mPercentage) {
+            if (level <= 14) {
+                mPaintFont.setColor(mPaintRed.getColor());
+            } else {
+                mPaintFont.setColor(mCircleTextColor);
+            }
             canvas.drawText(Integer.toString(level), textX, mTextY, mPaintFont);
         }
 
