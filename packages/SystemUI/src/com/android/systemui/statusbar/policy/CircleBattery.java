@@ -34,6 +34,7 @@ import android.graphics.Rect;
 import android.graphics.RectF;
 import android.os.BatteryManager;
 import android.os.Handler;
+import android.os.UserHandle;
 import android.provider.Settings;
 import android.util.AttributeSet;
 import android.view.View;
@@ -109,38 +110,7 @@ public class CircleBattery extends ImageView implements BatteryController.Batter
 
         @Override
         public void onChange(boolean selfChange) {
-            int batteryStyle = Settings.System.getInt(mContext.getContentResolver(),
-                    Settings.System.STATUS_BAR_BATTERY, 0);
-
-            Resources res = getResources();
-
-            batteryStyle = (Settings.System.getInt(mContext.getContentResolver(),
-                    Settings.System.STATUS_BAR_BATTERY, 0));
-
-            mCircleColor = (Settings.System.getInt(mContext.getContentResolver(),
-                    Settings.System.STATUS_BAR_CIRCLE_BATTERY_COLOR, res.getColor(R.color.holo_blue_dark)));
-            mCircleTextColor = (Settings.System.getInt(mContext.getContentResolver(),
-                    Settings.System.STATUS_BAR_CIRCLE_BATTERY_TEXT_COLOR, res.getColor(R.color.holo_blue_dark)));
-            mCircleAnimSpeed = (Settings.System.getInt(mContext.getContentResolver(),
-                    Settings.System.STATUS_BAR_CIRCLE_BATTERY_ANIMATIONSPEED, 3));
-
-            if (Settings.System.getInt(mContext.getContentResolver(),
-                    Settings.System.STATUS_BAR_CIRCLE_BATTERY_RESET, 0) == 1) {
-                mCircleColor = res.getColor(R.color.holo_blue_dark);
-                mCircleTextColor = res.getColor(R.color.holo_blue_dark);
-            }
-
-            /*
-             * initialize vars and force redraw
-             */
-            initializeCircleVars();
-            mRectLeft = null;
-            mCircleSize = 0;
-
-            mActivated = (batteryStyle == BatteryController.BATTERY_STYLE_CIRCLE
-			        || batteryStyle == BatteryController.BATTERY_STYLE_CIRCLE_PERCENT);
-            mPercentage = (batteryStyle == BatteryController.BATTERY_STYLE_CIRCLE_PERCENT);	mPercentage = (batteryStyle == BatteryController.BATTERY_STYLE_CIRCLE_PERCENT);
-
+            updateSettings();
         }
     }
 
@@ -188,6 +158,43 @@ public class CircleBattery extends ImageView implements BatteryController.Batter
             mCircleSize = 0;    // makes sure, mCircleSize is reread from icons on
                                 // next attach
         }
+    }
+
+    public void updateSettings() {
+        int batteryStyle = Settings.System.getIntForUser(mContext.getContentResolver(),
+                    Settings.System.STATUS_BAR_BATTERY, 0, UserHandle.USER_CURRENT);
+
+        mActivated = (batteryStyle == BatteryController.BATTERY_STYLE_CIRCLE
+                || batteryStyle == BatteryController.BATTERY_STYLE_CIRCLE_PERCENT);
+        mPercentage = (batteryStyle == BatteryController.BATTERY_STYLE_CIRCLE_PERCENT);
+
+        updateVisibility();
+
+
+        Resources res = getResources();
+
+        batteryStyle = (Settings.System.getInt(mContext.getContentResolver(),
+                Settings.System.STATUS_BAR_BATTERY, 0));
+
+        mCircleColor = (Settings.System.getInt(mContext.getContentResolver(),
+                Settings.System.STATUS_BAR_CIRCLE_BATTERY_COLOR, res.getColor(R.color.holo_blue_dark)));
+        mCircleTextColor = (Settings.System.getInt(mContext.getContentResolver(),
+                Settings.System.STATUS_BAR_CIRCLE_BATTERY_TEXT_COLOR, res.getColor(R.color.holo_blue_dark)));
+        mCircleAnimSpeed = (Settings.System.getInt(mContext.getContentResolver(),
+                Settings.System.STATUS_BAR_CIRCLE_BATTERY_ANIMATIONSPEED, 3));
+
+        if (Settings.System.getInt(mContext.getContentResolver(),
+                Settings.System.STATUS_BAR_CIRCLE_BATTERY_RESET, 0) == 1) {
+            mCircleColor = res.getColor(R.color.holo_blue_dark);
+            mCircleTextColor = res.getColor(R.color.holo_blue_dark);
+        }
+
+        /*
+         * initialize vars and force redraw
+         */
+        initializeCircleVars();
+        mRectLeft = null;
+        mCircleSize = 0;
     }
 
     @Override

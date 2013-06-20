@@ -24,11 +24,9 @@ import android.content.ComponentName;
 import android.content.Context;
 import android.content.Intent;
 import android.content.IntentFilter;
-import android.content.res.Resources;
-import android.content.res.TypedArray;
-import android.graphics.Canvas;
-import android.graphics.Typeface;
-import android.graphics.drawable.Drawable;
+import android.database.ContentObserver;
+import android.os.Handler;
+import android.os.UserHandle;
 import android.provider.AlarmClock;
 import android.text.Spannable;
 import android.text.SpannableStringBuilder;
@@ -61,6 +59,9 @@ public class ClockStock extends TextView implements OnClickListener, OnLongClick
     private Calendar mCalendar;
     private String mClockFormatString;
     private SimpleDateFormat mClockFormat;
+    private Locale mLocale;
+    private SettingsObserver mObserver;
+    private boolean mHidden;
 
     private static final int AM_PM_STYLE_NORMAL  = 0;
     private static final int AM_PM_STYLE_SMALL   = 1;
@@ -80,6 +81,11 @@ public class ClockStock extends TextView implements OnClickListener, OnLongClick
         super(context, attrs, defStyle);
         setOnClickListener(this);
         setOnLongClickListener(this);
+    }
+
+    public void setHidden(boolean hidden) {
+        mHidden = hidden;
+        updateVisibility();
     }
 
     @Override

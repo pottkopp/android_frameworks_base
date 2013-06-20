@@ -23,6 +23,8 @@ import android.content.Intent;
 import android.content.IntentFilter;
 import android.database.ContentObserver;
 import android.os.Handler;
+import android.os.UserHandle;
+import android.provider.AlarmClock;
 import android.provider.Settings;
 import android.text.Spannable;
 import android.text.SpannableStringBuilder;
@@ -70,6 +72,9 @@ public class Clock extends TextView {
 
     protected int mClockDateStyle = CLOCK_DATE_STYLE_UPPERCASE;
 
+    private SettingsObserver mObserver;
+    private boolean mHidden;
+
     public static final int STYLE_CLOCK_RIGHT   = 0;
     public static final int STYLE_CLOCK_CENTER  = 1;
 
@@ -113,8 +118,11 @@ public class Clock extends TextView {
             updateSettings();
         }
 
-        @Override
-        public void onChange(boolean selfChange) {
+        void unobserve() {
+            mContext.getContentResolver().unregisterContentObserver(this);
+        }
+
+        @Override public void onChange(boolean selfChange) {
             updateSettings();
         }
     }
@@ -129,6 +137,19 @@ public class Clock extends TextView {
 
     public Clock(Context context, AttributeSet attrs, int defStyle) {
         super(context, attrs, defStyle);
+
+        mHandler = new Handler();
+        mObserver = new SettingsObserver(mHandler);
+        if (isClickable()) {
+            setOnClickListener(this);
+            setOnLongClickListener(this);
+        }
+        updateSettings();
+    }
+
+    public void setHidden(boolean hidden) {
+        mHidden = hidden;
+        updateVisibility();
     }
 
     @Override
@@ -146,6 +167,7 @@ public class Clock extends TextView {
             filter.addAction(Intent.ACTION_USER_SWITCHED);
 
             getContext().registerReceiver(mIntentReceiver, filter, null, getHandler());
+            mObserver.observe();
         }
 
         // NOTE: It's safe to do these after registering the receiver since the receiver always runs
@@ -154,10 +176,8 @@ public class Clock extends TextView {
         // The time zone may have changed while the receiver wasn't registered, so update the Time
         mCalendar = Calendar.getInstance(TimeZone.getDefault());
 
-        mHandler = new Handler();
-        SettingsObserver settingsObserver = new SettingsObserver(mHandler);
-        settingsObserver.observe();
-        updateSettings();
+        // Make sure we update to the current time
+        updateClock();
     }
 
     @Override
@@ -165,6 +185,7 @@ public class Clock extends TextView {
         super.onDetachedFromWindow();
         if (mAttached) {
             getContext().unregisterReceiver(mIntentReceiver);
+            mObserver.unobserve();
             mAttached = false;
         }
     }
@@ -280,6 +301,7 @@ public class Clock extends TextView {
             int magic1 = result.indexOf(MAGIC1);
             int magic2 = result.indexOf(MAGIC2);
             if (magic1 >= 0 && magic2 > magic1) {
+                SpannableStringBuilder formatted = new SpannableStringBuilder(result);
                 if (mAmPmStyle == AM_PM_STYLE_GONE) {
                     formatted.delete(magic1, magic2+1);
                 } else {
@@ -291,6 +313,7 @@ public class Clock extends TextView {
                     formatted.delete(magic2, magic2 + 1);
                     formatted.delete(magic1, magic1 + 1);
                 }
+                return formatted;
             }
         }
         if (mClockDateDisplay != CLOCK_DATE_DISPLAY_NORMAL) {
@@ -355,5 +378,13 @@ public class Clock extends TextView {
             setVisibility(View.GONE);
     }
 
+    @Override
+    public boolean onLongClick(View v) {
+        Intent intent = new Intent(AlarmClock.ACTION_SET_ALARM);
+        collapseStartActivity(intent);
+
+        // consume event
+        return true;
+    }
 }
 
