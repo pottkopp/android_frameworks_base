@@ -53,6 +53,7 @@ public class CircleBattery extends ImageView implements BatteryController.Batter
     private boolean mPercentage;    // whether or not to show percentage number
     private int     mBatteryStatus; // current battery status
     private int     mLevel;         // current battery level
+    private int mWarningLevel;      // battery level under which circle should become red
     private int     mAnimOffset;    // current level of charging animation
     private boolean mIsAnimating;   // stores charge-animation status to reliably remove callbacks
 
@@ -133,8 +134,9 @@ public class CircleBattery extends ImageView implements BatteryController.Batter
 
         mObserver = new SettingsObserver(mHandler);
 
-        initializeCircleVars();
+        mWarningLevel = context.getResources().getInteger(R.integer.config_lowBatteryWarningLevel);
 
+        initializeCircleVars();
     }
 
     @Override
@@ -302,8 +304,6 @@ public class CircleBattery extends ImageView implements BatteryController.Batter
         // font needs some extra settings
         mPaintFont.setTextAlign(Align.CENTER);
         mPaintFont.setFakeBoldText(true);
-
-        mWarningLevel = context.getResources().getInteger(R.integer.config_lowBatteryWarningLevel);
     }
 
     /**
