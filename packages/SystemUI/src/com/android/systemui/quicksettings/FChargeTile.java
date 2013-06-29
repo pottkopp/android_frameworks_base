@@ -62,19 +62,23 @@ public class FChargeTile extends QuickSettingsTile {
             @Override
             public void onClick(View v) {
                 try {
-                        enabled = !isFastChargeOn();
-                        File fastcharge = new File(FAST_CHARGE_DIR, FAST_CHARGE_FILE);
-                        FileWriter fwriter = new FileWriter(fastcharge);
-                        BufferedWriter bwriter = new BufferedWriter(fwriter);
-                        bwriter.write(enabled ? "1" : "0");
-                        bwriter.close();
-                        Settings.System.putInt(mContext.getContentResolver(),
-                             Settings.System.FCHARGE_ENABLED, enabled ? 1 : 0);
-                    } catch (IOException e) {
-                        Log.e("FChargeToggle", "Couldn't write fast_charge file");
-                        Settings.System.putInt(mContext.getContentResolver(),
-                             Settings.System.FCHARGE_ENABLED, 0);
-                    }
+                    enabled = !isFastChargeOn();
+                    File fastcharge = new File(FAST_CHARGE_DIR, FAST_CHARGE_FILE);
+                    FileWriter fwriter = new FileWriter(fastcharge);
+                    BufferedWriter bwriter = new BufferedWriter(fwriter);
+                    bwriter.write(enabled ? "1" : "0");
+                    bwriter.close();
+                    Settings.System.putInt(mContext.getContentResolver(),
+                         Settings.System.FCHARGE_ENABLED, enabled ? 1 : 0);
+                } catch (IOException e) {
+                    Log.e("FChargeToggle", "Couldn't write fast_charge file");
+                    Settings.System.putInt(mContext.getContentResolver(),
+                         Settings.System.FCHARGE_ENABLED, 0);
+                }
+
+                if (isFlipTilesEnabled()) {
+                    flipTile(0);
+                } 
             }
         };
 
