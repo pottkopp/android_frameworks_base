@@ -449,7 +449,7 @@ final class Settings {
                                 privacyGuard = android.provider.Settings.Secure.getIntForUser(
                                     mContext.getContentResolver(),
                                     android.provider.Settings.Secure.PRIVACY_GUARD_DEFAULT,
-                                    0, installUser.getIdentifier()) == 1;
+                                    0, user.id) == 1;
                             }
                             p.setUserState(user.id, COMPONENT_ENABLED_STATE_DEFAULT,
                                     installed,
