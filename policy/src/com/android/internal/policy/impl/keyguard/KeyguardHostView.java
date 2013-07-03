@@ -78,7 +78,7 @@ public class KeyguardHostView extends KeyguardViewBase {
     // Found in KeyguardAppWidgetPickActivity.java
     static final int APPWIDGET_HOST_ID = 0x4B455947;
 
-    private final int MAX_WIDGETS = 9;
+    private final int MAX_WIDGETS = 20;
 
     private AppWidgetHost mAppWidgetHost;
     private AppWidgetManager mAppWidgetManager;
@@ -307,6 +307,7 @@ public class KeyguardHostView extends KeyguardViewBase {
         }
         checkAppWidgetConsistency();
         mSwitchPageRunnable.run();
+
         // This needs to be called after the pages are all added.
         mViewStateManager.showUsabilityHints();
 
@@ -1148,7 +1149,9 @@ public class KeyguardHostView extends KeyguardViewBase {
         LayoutInflater inflater = LayoutInflater.from(mContext);
         inflater.inflate(R.layout.keyguard_transport_control_view, this, true);
 
-        if (!mSafeModeEnabled && !widgetsDisabledByDpm()) {
+        if (!mSafeModeEnabled && !widgetsDisabledByDpm()
+                && Settings.System.getInt(mContext.getContentResolver(),
+                Settings.System.KG_ALL_WIDGETS, 1) == 1) {
             View addWidget = inflater.inflate(R.layout.keyguard_add_widget, this, false);
             mAppWidgetContainer.addWidget(addWidget, 0);
             View addWidgetButton = addWidget.findViewById(R.id.keyguard_add_widget_view);
