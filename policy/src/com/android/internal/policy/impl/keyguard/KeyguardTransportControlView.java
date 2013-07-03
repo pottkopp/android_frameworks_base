@@ -233,7 +233,8 @@ public class KeyguardTransportControlView extends FrameLayout implements OnClick
         if (DEBUG) Log.v(TAG, "updateSettings(): mShouldBeShown=" + mShouldBeShown);
         if (oldShown != mShouldBeShown) {
             callCallbackIfNeeded();
-            if (mShouldBeShown) {
+            if (mShouldBeShown && mMusicClientPresent
+                    && mCurrentPlayState != RemoteControlClient.PLAYSTATE_NONE) {
                 mTransportCallback.onPlayStateChanged();
             }
         }
