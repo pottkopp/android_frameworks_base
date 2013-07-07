@@ -140,6 +140,10 @@ public class ProfileManagerService extends IProfileManager.Stub {
         }
     };
 
+    private String getActiveSSID() {
+        return mWifiManager.getConnectionInfo().getSSID().replace("\"", "");
+    }
+
     public ProfileManagerService(Context context) {
         mContext = context;
         mWifiManager = (WifiManager)mContext.getSystemService(Context.WIFI_SERVICE);
@@ -194,6 +198,8 @@ public class ProfileManagerService extends IProfileManager.Stub {
         }
     }
 
+<<<<<<< HEAD
+=======
     private String getActiveSSID() {
         WifiInfo wifiinfo = mWifiManager.getConnectionInfo();
         if (wifiinfo == null) {
@@ -206,6 +212,7 @@ public class ProfileManagerService extends IProfileManager.Stub {
         return ssid.toString();
     }
 
+>>>>>>> head
     @Override
     public void resetAll() {
         enforceChangePermissions();
