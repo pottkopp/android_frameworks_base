@@ -115,6 +115,7 @@
 				    android:layout_height="50dp"
 				    android:scaleType="center"
 				    android:layout_gravity="bottom|left"
+                                    android:layout_marginBottom="25dp" 
 				    android:src="@drawable/ic_recents_clear" />
 
                 <ImageView
@@ -124,6 +125,7 @@
                     android:layout_height="50dp"
                     android:scaleType="center"
                     android:layout_gravity="bottom|right"
+                    android:layout_marginBottom="25dp" 
                     android:src="@drawable/ic_recents_clear" /> 
 
 				<include layout="@layout/status_bar_no_recent_apps"
