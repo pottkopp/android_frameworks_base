@@ -43,7 +43,7 @@ public class FChargeButton extends PowerButton {
     public static final String FAST_CHARGE_DIR = "/sys/kernel/fast_charge";
     public static final String FAST_CHARGE_FILE = "force_fast_charge";
     protected boolean on = false;
-
+    
     private static final List<Uri> OBSERVED_URIS = new ArrayList<Uri>();
     static {
         OBSERVED_URIS.add(Settings.System.getUriFor(Settings.System.FCHARGE_ENABLED));
