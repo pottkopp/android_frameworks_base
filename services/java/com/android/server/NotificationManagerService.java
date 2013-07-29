@@ -411,6 +411,9 @@ public class NotificationManagerService extends INotificationManager.Stub
                 mPolicyFile = new AtomicFile(new File(dir, "notification_policy.xml"));
 
                 mBlockedPackages.clear();
+            }
+        }
+    }
 
     private int readPolicy(AtomicFile file, String lookUpTag, HashSet<String> db, String resultTag, int defaultResult) {
         int result = defaultResult;
