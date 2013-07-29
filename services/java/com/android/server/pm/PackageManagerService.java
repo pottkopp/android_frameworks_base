@@ -3664,6 +3664,7 @@ public class PackageManagerService extends IPackageManager.Stub {
         if (pkgs != null) {
             int i = 0;
             for (PackageParser.Package pkg : pkgs) {
+                PackageParser.Package p = pkgs.get(i);
                 if (!isFirstBoot()) {
                     i++;
                     try {
