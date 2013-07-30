@@ -122,7 +122,7 @@ public class KeyguardHostView extends KeyguardViewBase {
 
     private boolean mUserSetupCompleted;
 
-    // User for whom this host view was created.  Final because we should never change the
+    // User for whom this host view was created. Final because we should never change the
     // id without reconstructing an instance of KeyguardHostView. See note below...
     private final int mUserId;
 
@@ -409,7 +409,6 @@ public class KeyguardHostView extends KeyguardViewBase {
         }
         checkAppWidgetConsistency();
         mSwitchPageRunnable.run();
-
         // This needs to be called after the pages are all added.
         mViewStateManager.showUsabilityHints();
 
@@ -468,7 +467,7 @@ public class KeyguardHostView extends KeyguardViewBase {
     }
 
     private void setBackButtonEnabled(boolean enabled) {
-        if (mContext instanceof Activity) return;  // always enabled in activity mode
+        if (mContext instanceof Activity) return; // always enabled in activity mode
         setSystemUiVisibility(enabled ?
                 getSystemUiVisibility() & ~View.STATUS_BAR_DISABLE_BACK :
                 getSystemUiVisibility() | View.STATUS_BAR_DISABLE_BACK);
@@ -733,7 +732,7 @@ public class KeyguardHostView extends KeyguardViewBase {
         boolean showTimeout = false;
         if (remainingBeforeWipe < LockPatternUtils.FAILED_ATTEMPTS_BEFORE_WIPE_GRACE) {
             // If we reach this code, it means the user has installed a DevicePolicyManager
-            // that requests device wipe after N attempts.  Once we get below the grace
+            // that requests device wipe after N attempts. Once we get below the grace
             // period, we'll post this dialog every time as a clear warning until the
             // bombshell hits and the device is wiped.
             if (remainingBeforeWipe > 0) {
@@ -1194,7 +1193,7 @@ public class KeyguardHostView extends KeyguardViewBase {
             return true;
         } else {
             if (updateDbIfFailed) {
-                Log.w(TAG, "*** AppWidgetInfo for app widget id " + appId + "  was null for user"
+                Log.w(TAG, "*** AppWidgetInfo for app widget id " + appId + " was null for user"
                         + mUserId + ", deleting");
                 mAppWidgetHost.deleteAppWidgetId(appId);
                 mLockPatternUtils.removeAppWidget(appId);
@@ -1262,12 +1261,10 @@ public class KeyguardHostView extends KeyguardViewBase {
     }
 
     private void addDefaultWidgets() {
-        LayoutInflater inflater = LayoutInflater.from(mContext);
-        inflater.inflate(R.layout.keyguard_transport_control_view, this, true);
-
         if (!mSafeModeEnabled && !widgetsDisabledByDpm()
                 && Settings.System.getInt(mContext.getContentResolver(),
                 Settings.System.KG_ALL_WIDGETS, 1) == 1) {
+            LayoutInflater inflater = LayoutInflater.from(mContext);
             View addWidget = inflater.inflate(R.layout.keyguard_add_widget, this, false);
             mAppWidgetContainer.addWidget(addWidget, 0);
             View addWidgetButton = addWidget.findViewById(R.id.keyguard_add_widget_view);
@@ -1281,7 +1278,7 @@ public class KeyguardHostView extends KeyguardViewBase {
         }
 
         // We currently disable cameras in safe mode because we support loading 3rd party
-        // cameras we can't trust.  TODO: plumb safe mode into camera creation code and only
+        // cameras we can't trust. TODO: plumb safe mode into camera creation code and only
         // inflate system-provided camera?
         if (!mSafeModeEnabled && !cameraDisabledByDpm() && mUserSetupCompleted
                 && mContext.getResources().getBoolean(R.bool.kg_enable_camera_default_widget)) {
@@ -1480,7 +1477,7 @@ public class KeyguardHostView extends KeyguardViewBase {
         // If the transport is showing, force it to show it on restore.
         final boolean showing = mTransportControl != null
                 && mAppWidgetContainer.getWidgetPageIndex(mTransportControl) >= 0;
-        ss.transportState =  showing ? TRANSPORT_VISIBLE : mTransportState;
+        ss.transportState = showing ? TRANSPORT_VISIBLE : mTransportState;
         ss.appWidgetToShow = mAppWidgetToShow;
         return ss;
     }
