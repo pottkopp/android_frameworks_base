@@ -4033,16 +4033,6 @@ public final class Settings {
          */
         public static final String NOTIFICATION_SHOW_WIFI_SSID = "notification_show_wifi_ssid"; 
 
-        /**
-         * @hide
-         */
-        public static final String STATUS_BAR_BRIGHTNESS_SLIDER = "statusbar_brightness_slider";
-
-        /**
-         * @hide
-         */
-        public static final String STATUSBAR_TOGGLES_BRIGHTNESS_LOC = "statusbar_toggles_brightness_loc";
-
 	/**
          * Sets transparency of statusbar
          * @hide
