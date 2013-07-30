@@ -72,4 +72,11 @@
     <string name="pie_phone_status_no_service">Kein Dienst</string>
     <string name="pie_phone_status_airplane_mode">Flugmodus</string>
     <string name="pie_phone_status_emergency_only">Nur Notrufe</string>
+
+    <!-- Recents Ram Bar -->
+    <string name="memory">RAM</string>
+    <!-- [CHAR LIMIT=10] Running services, summary of background processes -->
+    <string name="service_free_mem"><xliff:g id="memory">%1$s</xliff:g> frei</string>
+    <!-- [CHAR LIMIT=10] Running services, summary of foreground processes -->
+    <string name="service_used_mem"><xliff:g id="memory">%1$s</xliff:g> verwendet</string>  
 </resources>
