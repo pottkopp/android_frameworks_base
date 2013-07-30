@@ -18,6 +18,7 @@ import android.view.View;
 import android.view.View.OnClickListener;
 import android.view.View.OnLongClickListener;
 import android.view.ViewGroup;
+import android.widget.ImageView;
 import android.widget.TextView;
 
 import com.android.systemui.R;
@@ -42,7 +43,7 @@ public class QuickSettingsTile implements OnClickListener {
     private Handler mHandler = new Handler();
 
     public QuickSettingsTile(Context context, QuickSettingsController qsc) {
-        this(context, qsc, R.layout.quick_settings_tile_generic);
+        this(context, qsc, R.layout.quick_settings_tile_basic);
     }
 
     public QuickSettingsTile(Context context, QuickSettingsController qsc, int layout) {
@@ -80,10 +81,13 @@ public class QuickSettingsTile implements OnClickListener {
     }
 
     void updateQuickSettings(){
-        TextView tv = (TextView) mTile.findViewById(R.id.tile_textview);
+        TextView tv = (TextView) mTile.findViewById(R.id.text);
         if (tv != null) {
-            tv.setCompoundDrawablesWithIntrinsicBounds(0, mDrawable, 0, 0);
             tv.setText(mLabel);
+        }
+        ImageView image = (ImageView) mTile.findViewById(R.id.image);
+        if (image != null) {
+            image.setImageResource(mDrawable);
         }
     }
 
