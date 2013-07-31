@@ -19,6 +19,9 @@
     <uses-permission android:name="android.permission.REMOTE_AUDIO_PLAYBACK" />
     <uses-permission android:name="com.android.alarm.permission.SET_ALARM" />
 
+    <uses-permission android:name="android.permission.ACCESS_THEME_SERVICE" />
+    <uses-permission android:name="android.permission.PACKAGE_USAGE_STATS" />
+
     <uses-permission android:name="android.permission.MANAGE_USERS" />
     <uses-permission android:name="android.permission.READ_PROFILE" />
     <uses-permission android:name="android.permission.READ_CONTACTS" />
@@ -77,6 +80,9 @@
     <uses-permission android:name="android.permission.WRITE_SECURE_SETTINGS" />
     <uses-permission android:name="android.permission.READ_SYNC_SETTINGS" />
     <uses-permission android:name="android.permission.WRITE_SYNC_SETTINGS" />
+
+    <!--Halo-->
+    <uses-permission android:name="android.permission.SYSTEM_ALERT_WINDOW"/>
 
     <application
         android:persistent="true"
@@ -241,6 +247,22 @@
             </intent-filter>
         </activity>
 
+        <activity android:name=".statusbar.sidebar.SidebarConfigurationActivity"
+                android:label="@string/title_activity_sidebar_configuration"
+                android:taskAffinity=""
+                android:excludeFromRecents="true"
+                android:exported="true">
+            <intent-filter>
+                <action android:name="android.intent.action.MAIN" />
+            </intent-filter>
+        </activity>
+
+
+        <provider
+                android:name=".statusbar.sidebar.SidebarContentProvider"
+                android:authorities="org.chameleonos.sidebar.contentprovider" >
+        </provider>
+
         <activity android:name=".Somnambulator"
             android:label="@string/start_dreams"
             android:icon="@mipmap/ic_launcher_dreams"
@@ -260,5 +282,8 @@
                 <category android:name="android.intent.category.DESK_DOCK" />
             </intent-filter>
         </activity>
+
+        <activity android:name="com.android.systemui.Transparent"
+            android:theme="@android:style/Theme.Translucent.NoTitleBar" />
     </application>
 </manifest>

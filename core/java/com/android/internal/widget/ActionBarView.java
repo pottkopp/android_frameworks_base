@@ -962,7 +962,6 @@ public class ActionBarView extends AbsActionBarView {
         }
 
         int contentWidth = MeasureSpec.getSize(widthMeasureSpec);
-
         int maxHeight = mContentHeight >= 0 ?
                 mContentHeight : MeasureSpec.getSize(heightMeasureSpec);
 

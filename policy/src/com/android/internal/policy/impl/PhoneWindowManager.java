@@ -452,6 +452,8 @@ public class PhoneWindowManager implements WindowManagerPolicy {
 
     int mExpandedDesktopStyle = -1;
 
+    boolean mHideStatusBar;
+
     // States of keyguard dismiss.
     private static final int DISMISS_KEYGUARD_NONE = 0; // Keyguard not being dismissed.
     private static final int DISMISS_KEYGUARD_START = 1; // Keyguard needs to be dismissed.
@@ -667,6 +669,12 @@ public class PhoneWindowManager implements WindowManagerPolicy {
             resolver.registerContentObserver(Settings.System.getUriFor(
                     Settings.System.KEY_APP_SWITCH_LONG_PRESS_ACTION), false, this,
                     UserHandle.USER_ALL);
+            resolver.registerContentObserver(Settings.System.getUriFor(
+                    Settings.System.HARDWARE_KEY_REBINDING), false, this);
+            resolver.registerContentObserver(Settings.System.getUriFor(
+                    Settings.System.NAVIGATION_BAR_HEIGHT), false, this);
+            resolver.registerContentObserver(Settings.System.getUriFor(
+                     Settings.System.HIDE_STATUSBAR), false, this); 
             resolver.registerContentObserver(Settings.System.getUriFor(
                     Settings.System.HARDWARE_KEY_REBINDING), false, this,
                     UserHandle.USER_ALL);
@@ -1521,6 +1529,37 @@ public class PhoneWindowManager implements WindowManagerPolicy {
                 mHasSoftInput = hasSoftInput;
                 updateRotation = true;
             }
+
+            // Update navigation bar dimensions
+            if (expandedDesktopHidesNavigationBar()) {
+                // Set the navigation bar's dimensions to 0 in expanded desktop mode
+                mNavigationBarWidthForRotation[mPortraitRotation]
+                        = mNavigationBarWidthForRotation[mUpsideDownRotation]
+                        = mNavigationBarWidthForRotation[mLandscapeRotation]
+                        = mNavigationBarWidthForRotation[mSeascapeRotation]
+                        = mNavigationBarHeightForRotation[mPortraitRotation]
+                        = mNavigationBarHeightForRotation[mUpsideDownRotation]
+                        = mNavigationBarHeightForRotation[mLandscapeRotation]
+                        = mNavigationBarHeightForRotation[mSeascapeRotation] = 0;
+            } else {
+                int  mNavigationBarHeight = Settings.System.getInt(resolver,
+                        Settings.System.NAVIGATION_BAR_HEIGHT, 48);
+
+                // Height of the navigation bar when presented horizontally at bottom
+                mNavigationBarHeightForRotation[mPortraitRotation] =
+                mNavigationBarHeightForRotation[mUpsideDownRotation] =
+                        mNavigationBarHeight * DisplayMetrics.DENSITY_DEVICE / DisplayMetrics.DENSITY_DEFAULT;
+                mNavigationBarHeightForRotation[mLandscapeRotation] =
+                mNavigationBarHeightForRotation[mSeascapeRotation] =
+                        mNavigationBarHeight * DisplayMetrics.DENSITY_DEVICE / DisplayMetrics.DENSITY_DEFAULT;
+
+                // Width of the navigation bar when presented vertically along one side
+                mNavigationBarWidthForRotation[mPortraitRotation] =
+                mNavigationBarWidthForRotation[mUpsideDownRotation] =
+                mNavigationBarWidthForRotation[mLandscapeRotation] =
+                mNavigationBarWidthForRotation[mSeascapeRotation] =
+                        (mNavigationBarHeight - 6) * DisplayMetrics.DENSITY_DEVICE / DisplayMetrics.DENSITY_DEFAULT;
+            }
         }
 
         if (updateRotation) {
@@ -1907,6 +1946,36 @@ public class PhoneWindowManager implements WindowManagerPolicy {
             return getNonDecorDisplayHeight(fullWidth, fullHeight, rotation) - mStatusBarHeight;
         }
         return getNonDecorDisplayHeight(fullWidth, fullHeight, rotation);
+    }
+
+    @Override
+    public int getWallpaperHeight(int rotation) {
+        return getWallpaperTop(rotation)+getWallpaperBottom(rotation);
+    }
+
+    @Override
+    public int getWallpaperWidth(int rotation) {
+        return getWallpaperLeft(rotation)+getWallpaperRight(rotation);
+    }
+
+    @Override
+    public int getWallpaperTop(int rotation) {
+        return mUnrestrictedScreenTop;
+    }
+
+    @Override
+    public int getWallpaperLeft(int rotation) {
+        return mUnrestrictedScreenLeft;
+    }
+
+    @Override
+    public int getWallpaperBottom(int rotation) {
+        return mUnrestrictedScreenTop+mUnrestrictedScreenHeight;
+    }
+
+    @Override
+    public int getWallpaperRight(int rotation) {
+        return mUnrestrictedScreenLeft+mUnrestrictedScreenWidth;
     }
 
     @Override
@@ -3143,7 +3212,8 @@ public class PhoneWindowManager implements WindowManagerPolicy {
                         // If the nav bar is currently requested to be visible,
                         // and not in the process of animating on or off, then
                         // we can tell the app that it is covered by it.
-                        mSystemBottom = mTmpNavigationFrame.top;
+                        mSystemBottom = displayHeight;
+                        mRestrictedScreenHeight = mTmpNavigationFrame.top - mDockTop;
                     }
                 } else {
                     // Landscape screen; nav bar goes to the right.
@@ -3164,7 +3234,8 @@ public class PhoneWindowManager implements WindowManagerPolicy {
                         // If the nav bar is currently requested to be visible,
                         // and not in the process of animating on or off, then
                         // we can tell the app that it is covered by it.
-                        mSystemRight = mTmpNavigationFrame.left;
+                        mSystemRight = displayWidth;
+                        mRestrictedScreenWidth = mTmpNavigationFrame.left - mDockLeft;
                     }
                 }
                 // Make sure the content and current rectangles are updated to
@@ -3195,6 +3266,10 @@ public class PhoneWindowManager implements WindowManagerPolicy {
                 vf.right = mStableRight;
                 vf.bottom = mStableBottom;
 
+                if(navVisible && !mNavigationBarOnBottom) {
+                    pf.right = df.right = vf.right = mTmpNavigationFrame.left;
+                }
+
                 mStatusBarLayer = mStatusBar.getSurfaceLayer();
 
                 // Let the status bar determine its size.
@@ -3213,7 +3288,7 @@ public class PhoneWindowManager implements WindowManagerPolicy {
                     // Status bar may go away, so the screen area it occupies
                     // is available to apps but just covering them when the
                     // status bar is visible.
-                    mDockTop = mUnrestrictedScreenTop + mStatusBarHeight;
+                    mDockTop = mUnrestrictedScreenTop+mStatusBarHeight;
 
                     mContentTop = mCurTop = mDockTop;
                     mContentBottom = mCurBottom = mDockBottom;
@@ -3231,9 +3306,11 @@ public class PhoneWindowManager implements WindowManagerPolicy {
                     // If the status bar is currently requested to be visible,
                     // and not in the process of animating on or off, then
                     // we can tell the app that it is covered by it.
-                    mSystemTop = mUnrestrictedScreenTop + mStatusBarHeight;
+                    mSystemTop = mUnrestrictedScreenTop;
                 }
             }
+            mDockBottom = navVisible ? mRestrictedScreenTop + mRestrictedScreenHeight : mDockBottom;
+            mDockRight = navVisible ? mRestrictedScreenLeft + mRestrictedScreenWidth: mDockRight;
         }
     }
 
@@ -3370,6 +3447,11 @@ public class PhoneWindowManager implements WindowManagerPolicy {
             // IM dock windows always go to the bottom of the screen.
             attrs.gravity = Gravity.BOTTOM;
             mDockLayer = win.getSurfaceLayer();
+        } else if (attrs.type == TYPE_WALLPAPER) {
+            pf.left = df.left = cf.left = vf.left = getWallpaperLeft(mUserRotation);
+            pf.top = df.top = cf.top = vf.top = getWallpaperTop(mUserRotation);
+            pf.right = df.right = cf.right = vf.right = getWallpaperRight(mUserRotation);
+            pf.bottom = df.bottom = cf.bottom = vf.bottom = getWallpaperBottom(mUserRotation);
         } else {
             if ((fl & (FLAG_LAYOUT_IN_SCREEN | FLAG_LAYOUT_INSET_DECOR))
                     == (FLAG_LAYOUT_IN_SCREEN | FLAG_LAYOUT_INSET_DECOR)) {
@@ -3635,10 +3717,10 @@ public class PhoneWindowManager implements WindowManagerPolicy {
                         df.bottom = of.bottom = cf.bottom = mContentBottom;
                     }
                     if (adjust != SOFT_INPUT_ADJUST_NOTHING) {
-                        vf.left = mCurLeft;
-                        vf.top = mCurTop;
-                        vf.right = mCurRight;
-                        vf.bottom = mCurBottom;
+                        vf.left = mRestrictedScreenLeft;
+                        vf.top =  mRestrictedScreenTop;
+                        vf.right = mRestrictedScreenLeft+mRestrictedScreenWidth;
+                        vf.bottom = mRestrictedScreenTop+mRestrictedScreenHeight;
                     } else {
                         vf.set(cf);
                     }
@@ -3837,7 +3919,9 @@ public class PhoneWindowManager implements WindowManagerPolicy {
                 // and mTopIsFullscreen is that that mTopIsFullscreen is set only if the window
                 // has the FLAG_FULLSCREEN set.  Not sure if there is another way that to be the
                 // case though.
-                if (topIsFullscreen) {
+                mHideStatusBar = Settings.System.getInt(mContext.getContentResolver(),
+                        Settings.System.HIDE_STATUSBAR, 0) == 1;
+                if (topIsFullscreen || mHideStatusBar) { 
                     if (DEBUG_LAYOUT) Log.v(TAG, "** HIDING status bar");
                     if (mStatusBar.hideLw(true)) {
                         changes |= FINISH_LAYOUT_REDO_LAYOUT;
@@ -5105,6 +5189,25 @@ public class PhoneWindowManager implements WindowManagerPolicy {
 
     ProgressDialog mBootMsgDialog = null;
 
+    /**
+     * name of package currently being dex optimized
+     * as shown through this.showBootMessage(msg, always);
+     */
+    static String currentPackageName;
+    public void setPackageName(String pkgName) {
+        if (pkgName == null) {
+            pkgName = "stop.looking.at.me.swan";
+        }
+        this.currentPackageName = pkgName;
+    }
+
+    // debugging 'Android is upgrading...' ProgressDialog
+    final boolean DEBUG_BOOTMSG = false;
+
+    // this method is called to create, if needed, and update boot ProgressDialog
+    // see @link frameworks/base/services/java/com/android/server/pm/
+    //              PackageManagerService.performBootDexOpt()
+
     /** {@inheritDoc} */
     public void showBootMessage(final CharSequence msg, final boolean always) {
         if (mHeadless) return;
@@ -5150,6 +5253,23 @@ public class PhoneWindowManager implements WindowManagerPolicy {
                     mBootMsgDialog.show();
                 }
                 mBootMsgDialog.setMessage(msg);
+
+                if (DEBUG_BOOTMSG) Log.d(TAG, "********** showBootMessage(" + msg +", " + always + ") updated ***********");
+                if (currentPackageName != null) {
+                    mBootMsgDialog.setTitle(msg);
+                    mBootMsgDialog.setMessage(currentPackageName);
+                    if (DEBUG_BOOTMSG) Log.d(TAG, "setTitle: " + msg + " setMessage: " + currentPackageName);
+                } else {
+                    if (DEBUG_BOOTMSG) Log.d(TAG, "failed; CURRENT_PACKAGE_NAME == null");
+                }
+                if (msg.equals(mContext.getResources().getString(R.string.android_upgrading_starting_apps))) {
+                    if (DEBUG_BOOTMSG) Log.d(TAG, "starting apps so we use normal layout");
+                    mBootMsgDialog.setTitle(R.string.android_upgrading_title);
+                    mBootMsgDialog.setMessage(mContext.getResources().getString(R.string.android_upgrading_starting_apps));
+                } else {
+                    if (DEBUG_BOOTMSG) Log.d(TAG, "not starting apps");
+                }
+
             }
         });
     }
