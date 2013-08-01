@@ -352,9 +352,6 @@ int register_android_server_BatteryService(JNIEnv* env)
                 if (access(path, R_OK) == 0)
                     gPaths.batteryPresentPath = path;
                 path.clear();
-                path.appendFormat("%s/%s/capacity", POWER_SUPPLY_PATH, name);
-                if (access(path, R_OK) == 0)
-                    gPaths.batteryCapacityPath = path;
 
                 /* For some weird, unknown reason Motorola phones provide
                 * capacity information only in 10% steps in the 'capacity'
@@ -363,6 +360,7 @@ int register_android_server_BatteryService(JNIEnv* env)
                 * on some devices, we'll use ro.product.use_charge_counter
                 * in build.prop to decide which capacity file to use.
                 */
+
                 char valueChargeCounter[PROPERTY_VALUE_MAX];
                 if (property_get("ro.product.use_charge_counter", valueChargeCounter, NULL)
                     && (!strcmp(valueChargeCounter, "1"))) {
@@ -374,7 +372,6 @@ int register_android_server_BatteryService(JNIEnv* env)
                     if (access(path, R_OK) == 0)
                         gPaths.batteryCapacityPath = strdup(path);
                 }
-
 
                 path.clear();
                 path.appendFormat("%s/%s/voltage_now", POWER_SUPPLY_PATH, name);
