@@ -27,6 +27,7 @@ import android.appwidget.AppWidgetProviderInfo;
 import android.content.Context;
 import android.os.Handler;
 import android.os.HandlerThread;
+import android.provider.Settings;
 import android.text.format.DateFormat;
 import android.util.AttributeSet;
 import android.util.Slog;
@@ -332,7 +333,7 @@ public class KeyguardWidgetPager extends PagedView implements PagedView.PageSwit
 
             // The framework adds a default padding to AppWidgetHostView. We don't need this padding
             // for the Keyguard, so we override it to be 0.
-            widget.setPadding(0,  0, 0, 0);
+            widget.setPadding(0, 0, 0, 0);
             frame.addView(widget, lp);
 
             // We set whether or not this widget supports vertical resizing.
@@ -365,7 +366,7 @@ public class KeyguardWidgetPager extends PagedView implements PagedView.PageSwit
         }
 
         // Update the frame content description.
-        View content = (widget == frame) ?  frame.getContent() : widget;
+        View content = (widget == frame) ? frame.getContent() : widget;
         if (content != null) {
             String contentDescription = mContext.getString(
                 com.android.internal.R.string.keyguard_accessibility_widget,
@@ -618,7 +619,11 @@ public class KeyguardWidgetPager extends PagedView implements PagedView.PageSwit
         for (int i = 0; i < count; i++) {
             KeyguardWidgetFrame child = getWidgetPageAt(i);
             if (i != mCurrentPage) {
-                child.setBackgroundAlpha(sidePageAlpha);
+                if(Settings.System.getInt(mContext.getContentResolver(),
+                        Settings.System.LOCKSCREEN_DISABLE_HINTS, 0) == 0) {
+                    child.fadeFrame(this, true, sidePageAlpha,
+                            CHILDREN_OUTLINE_FADE_IN_DURATION);
+                }
                 child.setContentAlpha(0f);
             } else {
                 child.setBackgroundAlpha(0f);
@@ -842,7 +847,7 @@ public class KeyguardWidgetPager extends PagedView implements PagedView.PageSwit
         if (shouldSetTopAlignedPivotForWidget(curPage)) {
             currentPage.setPivotY(0);
             // Note: we are working around the issue that setting the x-pivot to the same value as it
-            //       was does not actually work.
+            // was does not actually work.
             currentPage.setPivotX(0);
             currentPage.setPivotX(currentPage.getMeasuredWidth() / 2);
         }

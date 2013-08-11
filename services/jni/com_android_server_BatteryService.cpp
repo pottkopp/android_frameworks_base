@@ -366,11 +366,11 @@ int register_android_server_BatteryService(JNIEnv* env)
                     && (!strcmp(valueChargeCounter, "1"))) {
                    path.appendFormat("%s/%s/charge_counter", POWER_SUPPLY_PATH, name);
                    if (access(path, R_OK) == 0)
-                       gPaths.batteryCapacityPath = strdup(path);
+                       gPaths.batteryCapacityPath = path;
                 } else {
                     path.appendFormat("%s/%s/capacity", POWER_SUPPLY_PATH, name);
                     if (access(path, R_OK) == 0)
-                        gPaths.batteryCapacityPath = strdup(path);
+                        gPaths.batteryCapacityPath = path;
                 }
 
                 path.clear();
