@@ -1602,7 +1602,7 @@ public class Resources {
                     mConfiguration.smallestScreenWidthDp,
                     mConfiguration.screenWidthDp, mConfiguration.screenHeightDp,
                     mConfiguration.screenLayout,
-                    mConfiguration.uiInvertedMode, mConfiguration.uiMode,
+                    mConfiguration.uiMode,
                     Build.VERSION.RESOURCES_SDK_INT);
 
             if (DEBUG_CONFIG) {

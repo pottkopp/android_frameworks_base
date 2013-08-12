@@ -73,7 +73,6 @@ final class UiModeManagerService extends IUiModeManager.Stub {
     private int mNightMode = UiModeManager.MODE_NIGHT_NO;
     private boolean mCarModeEnabled = false;
     private boolean mCharging = false;
-    private int mUiInvertedMode;
     private final int mDefaultUiModeType;
     private final boolean mCarModeKeepsScreenOn;
     private final boolean mDeskModeKeepsScreenOn;
@@ -82,7 +81,6 @@ final class UiModeManagerService extends IUiModeManager.Stub {
     private boolean mComputedNightMode;
     private int mCurUiMode = 0;
     private int mSetUiMode = 0;
-    private int mSetUiInvertedMode = 0;
 
     private boolean mHoldingConfiguration = false;
     private Configuration mConfiguration = new Configuration();
@@ -163,24 +161,6 @@ final class UiModeManagerService extends IUiModeManager.Stub {
         }
     };
 
-    private final class SettingsObserver extends ContentObserver {
-        SettingsObserver(Handler handler) {
-            super(handler);
-        }
-
-        void observe() {
-            ContentResolver resolver = mContext.getContentResolver();
-            resolver.registerContentObserver(Settings.Secure.getUriFor(
-                    Settings.Secure.UI_INVERTED_MODE),
-                    false, this);
-        }
-
-        @Override
-        public void onChange(boolean selfChange) {
-            updateUiInvertedMode();
-        }
-    }
-
     public UiModeManagerService(Context context, TwilightService twilight) {
         mContext = context;
         mTwilightService = twilight;
@@ -203,8 +183,6 @@ final class UiModeManagerService extends IUiModeManager.Stub {
 
         mConfiguration.setToDefaults();
 
-        updateUiInvertedMode();
-
         mDefaultUiModeType = context.getResources().getInteger(
                 com.android.internal.R.integer.config_defaultUiModeType);
         mCarModeKeepsScreenOn = (context.getResources().getInteger(
@@ -218,19 +196,6 @@ final class UiModeManagerService extends IUiModeManager.Stub {
                 Settings.Secure.UI_NIGHT_MODE, UiModeManager.MODE_NIGHT_AUTO);
 
         mTwilightService.registerListener(mTwilightListener, mHandler);
-    }
-
-    private void updateUiInvertedMode() {
-        /* possible inverted modes @link Configuration
-         * {@link #UI_INVERTED_MODE_NORMAL},
-         * {@link #UI_INVERTED_MODE_YES}, {@link #UI_INVERTED_MODE_NO},
-         */
-        mUiInvertedMode = Settings.Secure.getInt(mContext.getContentResolver(),
-                Settings.Secure.UI_INVERTED_MODE, mContext.getResources().getInteger(
-                com.android.internal.R.integer.config_uiInvertedMode));
-
-        mConfiguration.uiInvertedMode = mUiInvertedMode;
-        sendConfigurationLocked();
     }
 
     @Override // Binder call
@@ -385,10 +350,8 @@ final class UiModeManagerService extends IUiModeManager.Stub {
     }
 
     private void sendConfigurationLocked() {
-        if (mSetUiMode != mConfiguration.uiMode
-            || mSetUiInvertedMode != mConfiguration.uiInvertedMode) {
+        if (mSetUiMode != mConfiguration.uiMode) {
             mSetUiMode = mConfiguration.uiMode;
-            mSetUiInvertedMode = mConfiguration.uiInvertedMode;
 
             try {
                 ActivityManagerNative.getDefault().updateConfiguration(mConfiguration);
@@ -660,7 +623,6 @@ final class UiModeManagerService extends IUiModeManager.Stub {
                     pw.print(" mComputedNightMode="); pw.println(mComputedNightMode);
             pw.print("  mCurUiMode=0x"); pw.print(Integer.toHexString(mCurUiMode));
                     pw.print(" mSetUiMode=0x"); pw.println(Integer.toHexString(mSetUiMode));
-                    pw.print(" mSetUiInvertedMode=0x"); pw.println(Integer.toHexString(mSetUiInvertedMode));
             pw.print("  mHoldingConfiguration="); pw.print(mHoldingConfiguration);
                     pw.print(" mSystemReady="); pw.println(mSystemReady);
             pw.print("  mTwilightService.getCurrentState()=");

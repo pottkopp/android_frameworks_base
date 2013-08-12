@@ -111,12 +111,6 @@ public class ResolverActivity extends AlertActivity implements AdapterView.OnIte
     protected void onCreate(Bundle savedInstanceState, Intent intent,
             CharSequence title, Intent[] initialIntents, List<ResolveInfo> rList,
             boolean alwaysUseOption) {
-        if (getResources().getConfiguration().uiInvertedMode
-                == Configuration.UI_INVERTED_MODE_YES) {
-            setTheme(R.style.Theme_DeviceDefault_Dialog_Alert);
-        } else {
-            setTheme(R.style.Theme_DeviceDefault_Light_Dialog_Alert);
-        }
         super.onCreate(savedInstanceState);
         try {
             mLaunchedFromUid = ActivityManagerNative.getDefault().getLaunchedFromUid(
