@@ -174,10 +174,6 @@ final class UiModeManagerService extends IUiModeManager.Stub {
 
         ThemeUtils.registerThemeChangeReceiver(mContext, mThemeChangeReceiver);
 
-        // Register settings observer and set initial preferences
-        SettingsObserver settingsObserver = new SettingsObserver(new Handler());
-        settingsObserver.observe();
-
         mPowerManager = (PowerManager)context.getSystemService(Context.POWER_SERVICE);
         mWakeLock = mPowerManager.newWakeLock(PowerManager.FULL_WAKE_LOCK, TAG);
 
