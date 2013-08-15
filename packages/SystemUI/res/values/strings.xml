@@ -429,6 +429,9 @@
     <!-- Notification text: when GPS has found a fix [CHAR LIMIT=50] -->
     <string name="gps_notification_found_text">Location set by GPS</string>
 
+    <!-- Content description of the halo button in the notification panel for accessibility (not shown on the screen). [CHAR LIMIT=NONE] -->
+    <string name="accessibility_halo">Create notification halo.</string>
+
     <!-- Content description of the clear button in the notification panel for accessibility (not shown on the screen). [CHAR LIMIT=NONE] -->
     <string name="accessibility_clear_all">Clear all notifications.</string>
 
@@ -470,6 +473,8 @@
     <string name="quick_settings_battery_charging_label">Charging, <xliff:g id="number">%d</xliff:g><xliff:g id="percent">%%</xliff:g></string>
     <!-- QuickSettings: Battery Charged [CHAR LIMIT=NONE] -->
     <string name="quick_settings_battery_charged_label">Charged</string>
+    <!-- QuickSettings: Fast-Charge [CHAR LIMIT=NONE] -->
+    <string name="quick_settings_fcharge">Fast charge</string>
     <!-- QuickSettings: Bluetooth [CHAR LIMIT=NONE] -->
     <string name="quick_settings_bluetooth_label">Bluetooth</string>
     <!-- QuickSettings: Bluetooth (Multiple) [CHAR LIMIT=NONE] -->
@@ -515,8 +520,14 @@
     <!-- QuickSettings: Brightness dialog auto brightness button [CHAR LIMIT=NONE] -->
     <string name="quick_settings_brightness_dialog_auto_brightness_label">AUTO</string>
 
+
     <!-- Title of help text shown when the notification panel is pulled down for the very first time. [CHAR LIMIT=NONE] -->
     <string name="status_bar_help_title">Notifications appear here</string>
     <!-- Body of help text shown when the notification panel is pulled down for the very first time. [CHAR LIMIT=NONE] -->
     <string name="status_bar_help_text">Access them anytime by swiping down.\nSwipe down again for system controls.</string>
+
+    <!-- Notification drawer toasts -->
+    <string name="calendar_error_alert">No Calendar app installed.</string>
+    <string name="clock_error_alert">No DeskClock app installed.</string> 
+
 </resources>

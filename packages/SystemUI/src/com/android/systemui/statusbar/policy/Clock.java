@@ -16,10 +16,7 @@
 
 package com.android.systemui.statusbar.policy;
 
-import android.app.ActivityManagerNative;
-import android.app.StatusBarManager;
 import android.content.BroadcastReceiver;
-import android.content.ComponentName;
 import android.content.ContentResolver;
 import android.content.Context;
 import android.content.Intent;
@@ -36,8 +33,6 @@ import android.text.style.CharacterStyle;
 import android.text.style.RelativeSizeSpan;
 import android.util.AttributeSet;
 import android.view.View;
-import android.view.View.OnClickListener;
-import android.view.View.OnLongClickListener;
 import android.widget.TextView;
 
 import com.android.internal.R;
@@ -45,6 +40,7 @@ import com.android.internal.R;
 import java.text.SimpleDateFormat;
 import java.util.Calendar;
 import java.util.Locale;
+import java.util.Date;
 import java.util.TimeZone;
 
 import libcore.icu.LocaleData;
@@ -52,41 +48,81 @@ import libcore.icu.LocaleData;
 /**
  * Digital clock for the status bar.
  */
-public class Clock extends TextView implements OnClickListener, OnLongClickListener {
-    private boolean mAttached;
-    private Calendar mCalendar;
-    private String mClockFormatString;
-    private SimpleDateFormat mClockFormat;
+public class Clock extends TextView {
+
     private Locale mLocale;
     private SettingsObserver mObserver;
     private boolean mHidden;
+    
+    protected boolean mAttached;
+    protected Calendar mCalendar;
+    protected String mClockFormatString;
+    protected SimpleDateFormat mClockFormat;
 
-    private static final int AM_PM_STYLE_NORMAL  = 0;
-    private static final int AM_PM_STYLE_SMALL   = 1;
-    private static final int AM_PM_STYLE_GONE    = 2;
+
+    public static final int AM_PM_STYLE_NORMAL  = 0;
+    public static final int AM_PM_STYLE_SMALL   = 1;
+    public static final int AM_PM_STYLE_GONE    = 2;
+    public static final int PROTEKK_O_CLOCK     = 3;
+
+    public static final int CLOCK_DATE_DISPLAY_GONE = 0;
+    public static final int CLOCK_DATE_DISPLAY_SMALL = 1;
+    public static final int CLOCK_DATE_DISPLAY_NORMAL = 2;
+
+    protected int mClockDateDisplay = CLOCK_DATE_DISPLAY_GONE;
+
+    public static final int CLOCK_DATE_STYLE_REGULAR = 0;
+    public static final int CLOCK_DATE_STYLE_LOWERCASE = 1;
+    public static final int CLOCK_DATE_STYLE_UPPERCASE = 2;
+
+    protected int mClockDateStyle = CLOCK_DATE_STYLE_UPPERCASE;
+
+    public static final int STYLE_CLOCK_RIGHT   = 0;
+    public static final int STYLE_CLOCK_CENTER  = 1;
+
+    protected int mClockStyle = STYLE_CLOCK_RIGHT;
+
+    protected int mClockColor = com.android.internal.R.color.holo_blue_light;
 
     private int mAmPmStyle = AM_PM_STYLE_GONE;
+    
+    public boolean mShowClock;
 
     Handler mHandler;
 
-    class SettingsObserver extends ContentObserver {
+    protected class SettingsObserver extends ContentObserver {
         SettingsObserver(Handler handler) {
             super(handler);
         }
 
         void observe() {
             ContentResolver resolver = mContext.getContentResolver();
-            resolver.registerContentObserver(Settings.System.getUriFor(
-                    Settings.System.STATUS_BAR_AM_PM), false, this);
-            resolver.registerContentObserver(Settings.System.getUriFor(
-                    Settings.System.STATUS_BAR_CLOCK), false, this);
+            resolver.registerContentObserver(Settings.System
+                    .getUriFor(Settings.System.STATUS_BAR_CLOCK),
+                    false, this);
+            resolver.registerContentObserver(Settings.System
+                    .getUriFor(Settings.System.STATUSBAR_CLOCK_AM_PM_STYLE),
+                    false, this);
+            resolver.registerContentObserver(Settings.System
+                    .getUriFor(Settings.System.STATUSBAR_CLOCK_STYLE), false,
+                    this);
+            resolver.registerContentObserver(Settings.System
+                    .getUriFor(Settings.System.STATUSBAR_CLOCK_COLOR), false,
+                    this);
+            resolver.registerContentObserver(Settings.System
+                    .getUriFor(Settings.System.STATUSBAR_CLOCK_DATE_DISPLAY), false,
+                    this);
+            resolver.registerContentObserver(Settings.System
+                    .getUriFor(Settings.System.STATUSBAR_CLOCK_DATE_STYLE), false,
+                    this);
+            resolver.registerContentObserver(Settings.System
+                    .getUriFor(Settings.System.STATUSBAR_CLOCK_DATE_FORMAT), false,
+                    this);
+            updateSettings();
         }
 
-        void unobserve() {
-            mContext.getContentResolver().unregisterContentObserver(this);
-        }
-
-        @Override public void onChange(boolean selfChange) {
+        @Override
+        public void onChange(boolean selfChange) {
             updateSettings();
         }
     }
@@ -101,14 +137,6 @@ public class Clock extends TextView implements OnClickListener, OnLongClickListe
 
     public Clock(Context context, AttributeSet attrs, int defStyle) {
         super(context, attrs, defStyle);
-
-        mHandler = new Handler();
-        mObserver = new SettingsObserver(mHandler);
-        if (isClickable()) {
-            setOnClickListener(this);
-            setOnLongClickListener(this);
-        }
-        updateSettings();
     }
 
     public void setHidden(boolean hidden) {
@@ -131,7 +159,6 @@ public class Clock extends TextView implements OnClickListener, OnLongClickListe
             filter.addAction(Intent.ACTION_USER_SWITCHED);
 
             getContext().registerReceiver(mIntentReceiver, filter, null, getHandler());
-            mObserver.observe();
         }
 
         // NOTE: It's safe to do these after registering the receiver since the receiver always runs
@@ -140,8 +167,10 @@ public class Clock extends TextView implements OnClickListener, OnLongClickListe
         // The time zone may have changed while the receiver wasn't registered, so update the Time
         mCalendar = Calendar.getInstance(TimeZone.getDefault());
 
-        // Make sure we update to the current time
-        updateClock();
+        mHandler = new Handler();
+        SettingsObserver settingsObserver = new SettingsObserver(mHandler);
+        settingsObserver.observe();
+        updateSettings();
     }
 
     @Override
@@ -149,7 +178,6 @@ public class Clock extends TextView implements OnClickListener, OnLongClickListe
         super.onDetachedFromWindow();
         if (mAttached) {
             getContext().unregisterReceiver(mIntentReceiver);
-            mObserver.unobserve();
             mAttached = false;
         }
     }
@@ -226,13 +254,39 @@ public class Clock extends TextView implements OnClickListener, OnLongClickListe
         } else {
             sdf = mClockFormat;
         }
+
+        CharSequence dateString = null;
+
         String result = sdf.format(mCalendar.getTime());
+
+        if (mClockDateDisplay != CLOCK_DATE_DISPLAY_GONE) {
+            Date now = new Date();
+
+            String clockDateFormat = Settings.System.getString(getContext().getContentResolver(),
+                    Settings.System.STATUSBAR_CLOCK_DATE_FORMAT);
+
+            if (clockDateFormat == null || clockDateFormat.isEmpty()) {
+                // Set dateString to short uppercase Weekday (Default for AOKP) if empty
+                dateString = DateFormat.format("EEE", now) + " ";
+            } else {
+                dateString = DateFormat.format(clockDateFormat, now) + " ";
+            }
+            if (mClockDateStyle == CLOCK_DATE_STYLE_LOWERCASE) {
+                // When Date style is small, convert date to uppercase
+                result = dateString.toString().toLowerCase() + result;
+            } else if (mClockDateStyle == CLOCK_DATE_STYLE_UPPERCASE) {
+                result = dateString.toString().toUpperCase() + result;
+            } else {
+                result = dateString.toString() + result;
+            }
+        }
+
+        SpannableStringBuilder formatted = new SpannableStringBuilder(result);
 
         if (mAmPmStyle != AM_PM_STYLE_NORMAL) {
             int magic1 = result.indexOf(MAGIC1);
             int magic2 = result.indexOf(MAGIC2);
             if (magic1 >= 0 && magic2 > magic1) {
-                SpannableStringBuilder formatted = new SpannableStringBuilder(result);
                 if (mAmPmStyle == AM_PM_STYLE_GONE) {
                     formatted.delete(magic1, magic2+1);
                 } else {
@@ -244,17 +298,35 @@ public class Clock extends TextView implements OnClickListener, OnLongClickListe
                     formatted.delete(magic2, magic2 + 1);
                     formatted.delete(magic1, magic1 + 1);
                 }
-                return formatted;
             }
         }
-
-        return result;
-
+        if (mClockDateDisplay != CLOCK_DATE_DISPLAY_NORMAL) {
+            if (dateString != null) {
+                int dateStringLen = dateString.length();
+                if (mClockDateDisplay == CLOCK_DATE_DISPLAY_GONE) {
+                    formatted.delete(0, dateStringLen);
+                } else {
+                    if (mClockDateDisplay == CLOCK_DATE_DISPLAY_SMALL) {
+                        CharacterStyle style = new RelativeSizeSpan(0.7f);
+                        formatted.setSpan(style, 0, dateStringLen,
+                                          Spannable.SPAN_EXCLUSIVE_INCLUSIVE);
+                    }
+                }
+         }
+        }
+        return formatted;
     }
 
     public void updateSettings() {
         int amPmStyle = Settings.System.getIntForUser(mContext.getContentResolver(),
                 Settings.System.STATUS_BAR_AM_PM, 2, UserHandle.USER_CURRENT);
+
+        ContentResolver resolver = mContext.getContentResolver();
+        int defaultColor = getResources().getColor(
+                com.android.internal.R.color.holo_blue_light);
+
+        mShowClock = (Settings.System.getInt(resolver,
+                Settings.System.STATUS_BAR_CLOCK, 1) == 1);
 
         if (mAmPmStyle != amPmStyle) {
             mAmPmStyle = amPmStyle;
@@ -272,43 +344,31 @@ public class Clock extends TextView implements OnClickListener, OnLongClickListe
         boolean showClock = Settings.System.getIntForUser(mContext.getContentResolver(),
                 Settings.System.STATUS_BAR_CLOCK, 1, UserHandle.USER_CURRENT) == 1;
         setVisibility(showClock && !mHidden ? View.VISIBLE : View.GONE);
-    }
 
-    private void collapseStartActivity(Intent what) {
-        // collapse status bar
-        StatusBarManager statusBarManager = (StatusBarManager) getContext().getSystemService(
-                Context.STATUS_BAR_SERVICE);
-        statusBarManager.collapsePanels();
+        mClockStyle = Settings.System.getInt(resolver,
+                Settings.System.STATUSBAR_CLOCK_STYLE, STYLE_CLOCK_RIGHT);
+        mClockDateDisplay = Settings.System.getInt(resolver,
+                Settings.System.STATUSBAR_CLOCK_DATE_DISPLAY, CLOCK_DATE_DISPLAY_GONE);
+        mClockDateStyle = Settings.System.getInt(resolver,
+                Settings.System.STATUSBAR_CLOCK_DATE_STYLE, CLOCK_DATE_STYLE_UPPERCASE);
 
-        // dismiss keyguard in case it was active and no passcode set
-        try {
-            ActivityManagerNative.getDefault().dismissKeyguardOnNextActivity();
-        } catch (Exception ex) {
-            // no action needed here
+        mClockColor = Settings.System.getInt(resolver,
+                Settings.System.STATUSBAR_CLOCK_COLOR, defaultColor);
+        if (mClockColor == Integer.MIN_VALUE) {
+            // flag to reset the color
+            mClockColor = defaultColor;
         }
-
-        // start activity
-        what.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
-        mContext.startActivity(what);
+        setTextColor(mClockColor);
+        updateClockVisibility();
+        updateClock();
     }
 
-    @Override
-    public void onClick(View v) {
-        // start com.android.deskclock/.DeskClock
-        ComponentName clock = new ComponentName("com.android.deskclock",
-                "com.android.deskclock.DeskClock");
-        Intent intent = new Intent(Intent.ACTION_MAIN).addCategory(Intent.CATEGORY_LAUNCHER)
-                .setComponent(clock);
-        collapseStartActivity(intent);
+    protected void updateClockVisibility() {
+        if (mClockStyle == STYLE_CLOCK_RIGHT && mShowClock)
+            setVisibility(View.VISIBLE);
+        else
+            setVisibility(View.GONE);
     }
 
-    @Override
-    public boolean onLongClick(View v) {
-        Intent intent = new Intent(AlarmClock.ACTION_SET_ALARM);
-        collapseStartActivity(intent);
-
-        // consume event
-        return true;
-    }
 }
 

@@ -839,6 +839,7 @@
   <java-symbol type="string" name="volume_icon_description_media" />
   <java-symbol type="string" name="volume_icon_description_notification" />
   <java-symbol type="string" name="volume_icon_description_ringer" />
+  <java-symbol type="string" name="reset_perms" />
   <java-symbol type="string" name="wait" />
   <java-symbol type="string" name="wday1_date1_time1_wday2_date2_time2" />
   <java-symbol type="string" name="wday1_date1_wday2_date2" />
@@ -1195,6 +1196,8 @@
   <java-symbol type="style" name="Theme.DeviceDefault.Dialog.NoFrame" />
   <java-symbol type="style" name="Theme.IconMenu" />
   <java-symbol type="style" name="Theme.Panel.Volume" />
+  <java-symbol type="style" name="Theme.DeviceDefault.FloatingWindow" />
+  <java-symbol type="style" name="Theme.DeviceDefault.FloatingWindowLight" />
 
   <java-symbol type="attr" name="mediaRouteButtonStyle" />
   <java-symbol type="attr" name="externalRouteEnabledDrawable" />
@@ -1629,6 +1632,8 @@
   <java-symbol type="string" name="aerr_application" />
   <java-symbol type="string" name="aerr_process" />
   <java-symbol type="string" name="aerr_title" />
+  <java-symbol type="string" name="aerr_revoked_application" />
+  <java-symbol type="string" name="aerr_revoked_process" />
   <java-symbol type="string" name="android_upgrading_apk" />
   <java-symbol type="string" name="android_upgrading_complete" />
   <java-symbol type="string" name="android_upgrading_starting_apps" />
@@ -2023,6 +2028,8 @@
   <java-symbol type="string" name="symbol_picker_Y" />
   <java-symbol type="string" name="symbol_picker_z" />
   <java-symbol type="string" name="symbol_picker_Z" />
+
+  <java-symbol type="drawable" name="cm_default_wallpaper" />
 
   <!-- Pie Controls -->
   <java-symbol type="bool" name="config_allowPieService" />
